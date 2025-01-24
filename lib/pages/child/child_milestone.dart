@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:savings_application/controller/milestoneController.dart';
 import 'package:savings_application/helpers/default.dart';
 import 'package:savings_application/model/milestoneModel.dart';
-import 'package:savings_application/user/user_session.dart';
+import 'package:savings_application/user/user_id.dart';
 
 class ChildMilestone extends StatelessWidget {
   final MilestoneController controller = MilestoneController();
-  String? userId = UserSession().userId;
+  String? userId = UserId().userId;
 
   final milestoneNameController = TextEditingController();
   final targetAmountController = TextEditingController();
@@ -171,7 +171,7 @@ class ChildMilestone extends StatelessWidget {
                         onTap: () => selectDate(context),
                         // Show DatePicker on tap
                         validator: (value) {
-                          if (_completionDate == null) {
+                          if (completionDate == null) {
                             return "Completion Date is required";
                           }
                           return null;
@@ -191,7 +191,7 @@ class ChildMilestone extends StatelessWidget {
               child: Text('Cancel'),
             ),
             TextButton(
-              onPressed: () {
+              onPressed: () async {
                 final milestoneName = milestoneNameController.text;
                 // Parse pounds and pence values
                 final pounds = int.tryParse(poundsController.text) ?? 0;
@@ -206,17 +206,17 @@ class ChildMilestone extends StatelessWidget {
                 // Calculate the targetAmount
                 final targetAmount = pounds + (pence / 100);
 
-                if (milestoneName.isNotEmpty && targetAmount != null && _completionDate != null) {
+                if (milestoneName.isNotEmpty && targetAmount != null && completionDate != null) {
                   // Call your controller to add the milestone
                   final result = controller.addMilestone(
                     userId: int.parse(userId),
                     milestoneName: milestoneName,
                     targetAmount: targetAmount,
                     startDate: _startDate,
-                    completionDate: _completionDate!,
+                    completionDate: completionDate!,
                   );
 
-                  if (result) {
+                  if (await result) {
                     Navigator.pop(context); // Close dialog on success
                   } else {
                     // Show SnackBar if milestone creation fails

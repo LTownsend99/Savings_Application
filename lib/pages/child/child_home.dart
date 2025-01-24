@@ -3,7 +3,7 @@ import 'package:savings_application/controller/savings_controller.dart';
 import 'package:savings_application/helpers/default.dart';
 import 'package:savings_application/model/savingsModel.dart';
 import 'package:savings_application/pages/child/child_transfer.dart';
-import 'package:savings_application/user/user_session.dart';
+import 'package:savings_application/user/user_id.dart';
 import 'child_milestone.dart';
 import 'package:savings_application/utils/progress_bar.dart';
 
@@ -16,7 +16,7 @@ class ChildHomePageState extends State<ChildHomePage> {
   SavingsController savingsController = SavingsController();
 
   int _selectedIndex = 0;
-  String? userId = UserSession()
+  String? userId = UserId()
       .userId; // Keep this as it is, assuming it's part of user session management.
   double balance =
       0.00; // Initial balance, this can be updated based on real data later.

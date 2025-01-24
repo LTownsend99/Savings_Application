@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:savings_application/controller/account_controller.dart';
 import 'package:savings_application/helpers/default.dart';
+import 'package:savings_application/model/accountModel.dart';
 import 'package:savings_application/pages/child/child_home.dart';
 import 'package:savings_application/pages/parent/parent_home.dart';
 import 'package:savings_application/pages/register.dart';
-import 'package:savings_application/user/user_session.dart';
+import 'package:savings_application/user/user_account.dart';
+import 'package:savings_application/user/user_id.dart';
 
 class LoginPage extends StatelessWidget {
   final emailController = TextEditingController();
@@ -104,6 +106,9 @@ class LoginPage extends StatelessWidget {
                           print('Account Data: $account');
 
                           if (account != null) {
+                            AccountModel accountModel = AccountModel.fromJson(account); // Assuming `account` is a map
+                            UserAccount().saveAccount(accountModel); // Save the account globally
+
                             final role = account['role'];
                             if (role == 'child') {
                               Navigator.push(
@@ -118,10 +123,10 @@ class LoginPage extends StatelessWidget {
                                     builder: (context) => ParentHomePage()),
                               );
                             }
-                            UserSession().userId =
+                            UserId().userId =
                                 account['userId'].toString(); // Store userId globally
                             print(
-                                "User ID stored globally: ${UserSession().userId}");
+                                "User ID stored globally: ${UserId().userId}");
                           } else {
                             // Show error message if login failed
                             ScaffoldMessenger.of(context).showSnackBar(

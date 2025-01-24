@@ -56,7 +56,7 @@ class MilestoneController{
     return milestones?.isNotEmpty == true ? milestones?.first : null;
   }
 
-  Future<String?> addMilestone({
+  Future<bool> addMilestone({
     required int userId,
     required String milestoneName,
     required double targetAmount,
@@ -65,40 +65,29 @@ class MilestoneController{
   }) async {
     try {
       final response = await http.post(
-        Uri.parse("${url}create"),
-        headers: <String, String>{
-          "Content-Type": "application/json",
-        },
-        body: jsonEncode(<String, dynamic>{
-          "userId": userId.toString(),
+        Uri.parse("${url}/addMilestone"),
+        headers: {"Content-Type": "application/json"},
+        body: jsonEncode({
+          "userId": userId,
           "milestoneName": milestoneName,
-          "targetAmount": targetAmount.toString(),
+          "targetAmount": targetAmount,
           "startDate": startDate.toIso8601String(),
           "completionDate": completionDate.toIso8601String(),
         }),
       );
 
-      print("Response Status Code: ${response.statusCode}");
-      print("Response Body: ${response.body}");
-
       if (response.statusCode == 200) {
-        final Map<String, dynamic> responseData = jsonDecode(response.body);
-
-        if (responseData.containsKey('milestoneId')) {
-          return responseData['milestoneId'].toString(); // Return milestoneId on success
-        } else {
-          print("Error: 'milestoneId' not found in response");
-          return null;
-        }
+        return true; // Successfully created
       } else {
-        print("Failed to add milestone. Status Code: ${response.statusCode}");
-        return null;
+        print("Failed to create milestone. Status Code: ${response.statusCode}");
+        return false; // Failure
       }
     } catch (e) {
-      print("Error adding milestone: $e");
-      return null;
+      print("Error creating milestone: $e");
+      return false; // Error occurred
     }
   }
+
 
 
 }
