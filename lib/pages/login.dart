@@ -4,6 +4,7 @@ import 'package:savings_application/helpers/default.dart';
 import 'package:savings_application/pages/child/child_home.dart';
 import 'package:savings_application/pages/parent/parent_home.dart';
 import 'package:savings_application/pages/register.dart';
+import 'package:savings_application/user/user_session.dart';
 
 class LoginPage extends StatelessWidget {
   final emailController = TextEditingController();
@@ -98,7 +99,8 @@ class LoginPage extends StatelessWidget {
                           final password = passwordController.text;
 
                           // Call the login method instead of getAccount
-                          final account = await accountController.login(email: email, password: password);
+                          final account = await accountController.login(
+                              email: email, password: password);
                           print('Account Data: $account');
 
                           if (account != null) {
@@ -106,14 +108,20 @@ class LoginPage extends StatelessWidget {
                             if (role == 'child') {
                               Navigator.push(
                                 context,
-                                MaterialPageRoute(builder: (context) => ChildHomePage()),
+                                MaterialPageRoute(
+                                    builder: (context) => ChildHomePage()),
                               );
                             } else if (role == 'parent') {
                               Navigator.push(
                                 context,
-                                MaterialPageRoute(builder: (context) => ParentHomePage()),
+                                MaterialPageRoute(
+                                    builder: (context) => ParentHomePage()),
                               );
                             }
+                            UserSession().userId =
+                                account['userId'].toString(); // Store userId globally
+                            print(
+                                "User ID stored globally: ${UserSession().userId}");
                           } else {
                             // Show error message if login failed
                             ScaffoldMessenger.of(context).showSnackBar(
@@ -142,7 +150,8 @@ class LoginPage extends StatelessWidget {
                       onPressed: () {
                         Navigator.push(
                           context,
-                          MaterialPageRoute(builder: (context) => RegisterPage()),
+                          MaterialPageRoute(
+                              builder: (context) => RegisterPage()),
                         );
                       },
                       color: Default.getTitleColour(),
