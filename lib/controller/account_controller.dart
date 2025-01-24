@@ -1,11 +1,10 @@
 import 'dart:convert';
-import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
 class AccountController {
   var url = "http://10.0.2.2:8080/account/";
 
-  Future<bool> createAccount({
+  Future<String?> createAccount({
     required String firstName,
     required String lastName,
     required String email,
@@ -15,35 +14,44 @@ class AccountController {
     required DateTime dateOfBirth,
   }) async {
     try {
-      // Simulate a network call with a delay
-      final response = await http.post((Uri.parse(url + "create")),
-          headers: <String, String>{"Content-Type": "application/json"},
-          body: jsonEncode(<String, String>{
-            "firstName": firstName,
-            "lastName": lastName,
-            "email": email,
-            "passwordHash": passwordHash,
-            "role": role,
-            "childId": childId,
-            "dob": dateOfBirth.toIso8601String(),
-          }));
+      final response = await http.post(
+        Uri.parse("${url}create"),
+        headers: <String, String>{
+          "Content-Type": "application/json",
+        },
+        body: jsonEncode(<String, String>{
+          "firstName": firstName,
+          "lastName": lastName,
+          "email": email,
+          "passwordHash": passwordHash,
+          "role": role,
+          "childId": childId,
+          "dob": dateOfBirth.toIso8601String(),
+        }),
+      );
 
-      String responseString = response.body;
+      print("Response Status Code: ${response.statusCode}");
+      print("Response Body: ${response.body}");
 
-      //if (response.statusCode == 200) {}
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> responseData = jsonDecode(response.body);
 
-      // Simulate success
-      print("Account created for $firstName $lastName, Email: $email");
-      return true;
-
-      // For real implementation, you might call an API like:
-      // final response = await http.post(Uri.parse('your-api-endpoint'), body: {...});
-      // return response.statusCode == 200;
+        if (responseData.containsKey('userId')) {
+          return responseData['userId'].toString(); // Return userId on success
+        } else {
+          print("Error: 'userId' not found in response");
+          return null;
+        }
+      } else {
+        print("Failed to create account. Status Code: ${response.statusCode}");
+        return null;
+      }
     } catch (e) {
       print("Error creating account: $e");
-      return false;
+      return null;
     }
   }
+
 
   Future<Map<String, dynamic>?> login({
     required String email,
@@ -92,5 +100,4 @@ class AccountController {
       return null;
     }
   }
-
 }

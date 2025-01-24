@@ -21,7 +21,7 @@ class ChildHomePageState extends State<ChildHomePage> {
           Icon(Icons.home, size: 100, color: Colors.blue),
           SizedBox(height: 20),
           Text(
-            'Welcome to the Home Page!',
+            'Welcome to the Child Home Page!',
             style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
           ),
         ],

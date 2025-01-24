@@ -241,24 +241,13 @@ class RegisterPage extends StatelessWidget {
                         minWidth: double.infinity,
                         onPressed: () async {
                           if (_formKey.currentState?.validate() ?? false) {
-
-                            if(dateOfBirth == null)
-                              {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(
-                                      content: Text("Please select a valid date of birth."),
-                                    ),
-                                );
-                                return;
-                              }
-
                             ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
+                              const SnackBar(
                                 content: Text("Creating account..."),
                               ),
                             );
 
-                            bool isAccountCreated =
+                            String? userId =
                                 await accountController.createAccount(
                               firstName: firstNameController.text,
                               lastName: lastNameController.text,
@@ -269,19 +258,63 @@ class RegisterPage extends StatelessWidget {
                               dateOfBirth: dateOfBirth!,
                             );
 
-                            if (isAccountCreated) {
+                            if (userId != null) {
                               ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
+                                const SnackBar(
                                   content:
                                       Text("Account successfully created!"),
                                 ),
                               );
-                              Future.delayed(Duration(seconds: 1), () {
-                                Navigator.pop(context);
-                              });
+
+                              // Show the dialog with the userId
+                              showDialog(
+                                context: context,
+                                builder: (BuildContext context) {
+                                  return Dialog(
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(8.0),
+                                    ),
+                                    child: Stack(
+                                      children: [
+                                        Padding(
+                                          padding: const EdgeInsets.all(16.0),
+                                          child: Column(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              Text(
+                                                'Account Created!',
+                                                style: const TextStyle(
+                                                  fontWeight: FontWeight.bold,
+                                                  fontSize: 18.0,
+                                                ),
+                                              ),
+                                              const SizedBox(height: 10.0),
+                                              Text(
+                                                'User ID: $userId',
+                                                style: const TextStyle(
+                                                    fontSize: 16.0),
+                                              ),
+                                              const SizedBox(height: 20.0),
+                                            ],
+                                          ),
+                                        ),
+                                        Positioned(
+                                          right: 0.0,
+                                          child: IconButton(
+                                            icon: const Icon(Icons.close),
+                                            onPressed: () {
+                                              Navigator.pop(context);
+                                            },
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  );
+                                },
+                              );
                             } else {
                               ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
+                                const SnackBar(
                                   content: Text(
                                       "Account creation failed. Please try again."),
                                 ),
