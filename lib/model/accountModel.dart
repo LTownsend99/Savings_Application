@@ -3,7 +3,7 @@ import 'dart:convert';
 AccountModel accountModelJson(String str) =>
     AccountModel.fromJson(json.decode(str));
 
-///Convert model to json
+/// Convert model to JSON
 String accountModelToJson(AccountModel data) => json.encode(data.toJson());
 
 class AccountModel {
@@ -13,8 +13,8 @@ class AccountModel {
   String email;
   String passwordHash;
   String role;
-  int childId;
-  DateTime dateOfBirth;
+  int? childId; // Made nullable
+  DateTime? dateOfBirth; // Made nullable
 
   AccountModel({
     required this.userId,
@@ -23,31 +23,33 @@ class AccountModel {
     required this.email,
     required this.passwordHash,
     required this.role,
-    required this.childId,
-    required this.dateOfBirth});
+    this.childId,
+    this.dateOfBirth,
+  });
 
-  ///Convert json payload sent from the API
-  factory AccountModel.fromJson(Map<String, dynamic> json) =>
-      AccountModel(
-          userId: json["userId"],
-          firstName: json["firstName"],
-          lastName: json["lastName"],
-          email: json["email"],
-          passwordHash: json["passwordHash"],
-          role: json["role"],
-          childId: json["childId"],
-          dateOfBirth: json["dateOfBirth"]
-      );
+  /// Convert JSON payload sent from the API
+  factory AccountModel.fromJson(Map<String, dynamic> json) => AccountModel(
+    userId: json["userId"],
+    firstName: json["firstName"],
+    lastName: json["lastName"],
+    email: json["email"],
+    passwordHash: json["passwordHash"],
+    role: json["role"],
+    childId: json["childId"] != null ? json["childId"] : null, // If it's null, just assign null
+    dateOfBirth: json["dob"] != null ? DateTime.parse(json["dob"]) : null, // If date is null, assign null
+  );
 
-  ///convert from model to json object to send to the API
-  Map<String,dynamic> toJson() => {
+
+  /// Convert from model to JSON object to send to the API
+  Map<String, dynamic> toJson() => {
+    "userId": userId,
     "firstName": firstName,
     "lastName": lastName,
     "email": email,
     "passwordHash": passwordHash,
     "role": role,
     "childId": childId,
-    "dateOfBirth": dateOfBirth
+    "dob": dateOfBirth?.toIso8601String(),
   };
 
   get getUserId => userId;
@@ -58,6 +60,4 @@ class AccountModel {
   get getRole => role;
   get getChildId => childId;
   get getDateOfBirth => dateOfBirth;
-
-
 }

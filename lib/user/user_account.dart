@@ -12,8 +12,8 @@ class UserAccount {
 
   UserAccount._internal();
 
-  // Save account to memory
   void saveAccount(AccountModel account) {
+    print("Saving account: ${account.firstName} ${account.lastName}"); // Debug print
     userAccount = account;
   }
 
@@ -22,8 +22,8 @@ class UserAccount {
     userAccount = null;
   }
 
-  // Retrieve the account
   AccountModel? getAccount() {
+    print("Retrieving account: ${userAccount?.firstName} ${userAccount?.lastName}"); // Debug print
     return userAccount;
   }
 }

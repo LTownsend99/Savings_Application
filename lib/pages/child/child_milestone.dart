@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:savings_application/controller/milestoneController.dart';
 import 'package:savings_application/helpers/default.dart';
+import 'package:savings_application/model/accountModel.dart';
 import 'package:savings_application/model/milestoneModel.dart';
+import 'package:savings_application/user/user_account.dart';
 import 'package:savings_application/user/user_id.dart';
 
 class ChildMilestone extends StatelessWidget {
   final MilestoneController controller = MilestoneController();
   String? userId = UserId().userId;
+
 
   final milestoneNameController = TextEditingController();
   final targetAmountController = TextEditingController();
@@ -33,11 +36,12 @@ class ChildMilestone extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final userIdInt = userId != null ? int.tryParse(userId!) : null;
+
     return Scaffold(
-      body: FutureBuilder<List<MilestoneModel>?>(
-        future: controller.getMilestonesByStatus(
-          "active", // Ensure userId is parsed as int
-        ),
+      body: FutureBuilder<List<MilestoneModel>>(
+        // Ensure userId is provided and convert it to int
+        future: controller.getMilestonesForAccount(userId: userIdInt!),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Center(
@@ -58,6 +62,10 @@ class ChildMilestone extends StatelessWidget {
 
           // Data is available, build the scrollable list
           final milestones = snapshot.data!;
+
+          // Limit the milestones to show up to 4
+          final visibleMilestones = milestones.take(4).toList();
+
           return Padding(
             padding: const EdgeInsets.all(16.0),
             child: Container(
@@ -73,23 +81,43 @@ class ChildMilestone extends StatelessWidget {
                   ),
                 ],
               ),
-              child: SingleChildScrollView(
-                child: DataTable(
-                  columns: [
-                    DataColumn(label: Text('ID', style: TextStyle(fontWeight: FontWeight.bold))),
-                    DataColumn(label: Text('Name', style: TextStyle(fontWeight: FontWeight.bold))),
-                    DataColumn(label: Text('Saved', style: TextStyle(fontWeight: FontWeight.bold))),
-                    DataColumn(label: Text('Target', style: TextStyle(fontWeight: FontWeight.bold))),
-                  ],
-                  rows: milestones.map((milestone) {
-                    return DataRow(cells: [
-                      DataCell(Text(milestone.milestoneId.toString())),
-                      DataCell(Text(milestone.milestoneName)),
-                      DataCell(Text("\$${milestone.savedAmount.toStringAsFixed(2)}")),
-                      DataCell(Text("\$${milestone.targetAmount.toStringAsFixed(2)}")),
-                    ]);
-                  }).toList(),
-                ),
+              child: Column(
+                children: [
+                  // Show up to 4 milestones
+                  SizedBox(
+                    height: 450,  // Set a fixed height for the scrollable area
+                    child: ListView.builder(
+                      itemCount: visibleMilestones.length,
+                      itemBuilder: (context, index) {
+                        final milestone = visibleMilestones[index];
+                        return Card(
+                          margin: EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+                          elevation: 4,
+                          color: Colors.green.shade50,
+                          child: ListTile(
+                            title: Text(milestone.milestoneName),
+                            subtitle: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text("ID: ${milestone.milestoneId ?? "No ID"}"),
+                                Text("Saved: £${milestone.savedAmount.toStringAsFixed(2)}"),
+                                Text("Target: £${milestone.targetAmount.toStringAsFixed(2)}"),
+                              ],
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                  // If there are more than 4 milestones, show a scrollable "See More" button
+                  if (milestones.length > 4)
+                    TextButton(
+                      onPressed: () {
+                        // Show more milestones by navigating to another screen or expanding the list
+                      },
+                      child: Text('See More'),
+                    ),
+                ],
               ),
             ),
           );
@@ -100,10 +128,13 @@ class ChildMilestone extends StatelessWidget {
           _showAddMilestoneDialog(context, userId!);
         },
         child: Icon(Icons.add),
+        backgroundColor: Default.getTitleColour(),
+        foregroundColor: Colors.white,
         tooltip: 'Add New Milestone',
       ),
     );
   }
+
 
   void _showAddMilestoneDialog(BuildContext context, String userId) {
     final poundsController = TextEditingController();
@@ -157,29 +188,6 @@ class ChildMilestone extends StatelessWidget {
                   initialValue: "${_startDate.toLocal()}".split(' ')[0],
                   enabled: false, // Start date should not be editable
                 ),
-                Row(
-                  children: [
-                    Expanded(
-                      child: TextFormField(
-                        readOnly: true,
-                        // Prevent manual input
-                        decoration: const InputDecoration(
-                          labelText: "Completion Date",
-                          prefixIcon: Icon(Icons.calendar_today),
-                        ),
-                        controller: completionDateController,
-                        onTap: () => selectDate(context),
-                        // Show DatePicker on tap
-                        validator: (value) {
-                          if (completionDate == null) {
-                            return "Completion Date is required";
-                          }
-                          return null;
-                        },
-                      ),
-                    ),
-                  ],
-                ),
               ],
             ),
           ),
@@ -206,14 +214,16 @@ class ChildMilestone extends StatelessWidget {
                 // Calculate the targetAmount
                 final targetAmount = pounds + (pence / 100);
 
-                if (milestoneName.isNotEmpty && targetAmount != null && completionDate != null) {
-                  // Call your controller to add the milestone
+                AccountModel? account = UserAccount().getAccount();
+                print("Retrieved account: $account");
+
+                if (milestoneName.isNotEmpty) {
+                  // Call your controller to add the milestone (no completionDate)
                   final result = controller.addMilestone(
-                    userId: int.parse(userId),
+                    user: account!,
                     milestoneName: milestoneName,
                     targetAmount: targetAmount,
                     startDate: _startDate,
-                    completionDate: completionDate!,
                   );
 
                   if (await result) {
@@ -238,4 +248,5 @@ class ChildMilestone extends StatelessWidget {
       },
     );
   }
+
 }

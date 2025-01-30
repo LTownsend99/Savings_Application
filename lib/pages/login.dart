@@ -106,8 +106,8 @@ class LoginPage extends StatelessWidget {
                           print('Account Data: $account');
 
                           if (account != null) {
-                            AccountModel accountModel = AccountModel.fromJson(account); // Assuming `account` is a map
-                            UserAccount().saveAccount(accountModel); // Save the account globally
+                            AccountModel accountModel = AccountModel.fromJson(account);
+                            UserAccount().saveAccount(accountModel);
 
                             final role = account['role'];
                             if (role == 'child') {
