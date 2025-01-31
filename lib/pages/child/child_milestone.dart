@@ -137,8 +137,6 @@ class ChildMilestone extends StatelessWidget {
 
 
   void _showAddMilestoneDialog(BuildContext context, String userId) {
-    final poundsController = TextEditingController();
-    final penceController = TextEditingController();
 
     showDialog(
       context: context,
