@@ -1,8 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:savings_application/pages/login.dart';
+import 'package:savings_application/utils/week_savings_provider.dart';
 
 void main() {
-  runApp(MyApp());
+  runApp(ChangeNotifierProvider(
+    create: (context) => WeekSavingsProvider(),
+    child: MyApp(),
+  ),);
 }
 
 class MyApp extends StatelessWidget {

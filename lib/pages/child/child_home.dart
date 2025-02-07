@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:savings_application/controller/savings_controller.dart';
 import 'package:savings_application/helpers/default.dart';
 import 'package:savings_application/model/savingsModel.dart';
-import 'package:savings_application/pages/child/child_transfer.dart';
 import 'package:savings_application/user/user_id.dart';
-import 'child_milestone.dart';
+import 'package:savings_application/utils/saved_amount_provider.dart';
+import 'package:savings_application/utils/week_savings_provider.dart';  // Import the WeekSavingsProvider
 import 'package:savings_application/utils/progress_bar.dart';
+import 'child_milestone.dart';
+import 'child_transfer.dart';
 
 class ChildHomePage extends StatefulWidget {
   @override
@@ -14,12 +17,9 @@ class ChildHomePage extends StatefulWidget {
 
 class ChildHomePageState extends State<ChildHomePage> {
   SavingsController savingsController = SavingsController();
+  String? userId = UserId().userId;
 
   int _selectedIndex = 0;
-  String? userId = UserId()
-      .userId; // Keep this as it is, assuming it's part of user session management.
-  double balance =
-      0.00; // Initial balance, this can be updated based on real data later.
   late double totalSaved;
   double targetAmount = 300;
   late double progress;
@@ -39,29 +39,47 @@ class ChildHomePageState extends State<ChildHomePage> {
     });
   }
 
-  // Fetch balance from the database
-  Future<void> fetchBalance() async {
-    try {
-      final SavingsModel? savings = await savingsController.getBalance(savingsId: 1); // Replace 1 with the correct savingsId
+  @override
+  void initState() {
+    super.initState();
+    updateWeeklySavings(); // Update weekly savings when the page is loaded
+  }
 
-      if (savings != null) {
-        setState(() {
-          balance = savings.amount; // Update the balance using the fetched amount
-        });
+  // Method to update weekly savings on page load
+  void updateWeeklySavings() async {
+    final userIdInt = userId != null ? int.tryParse(userId!) : null;
+
+    if (userIdInt != null) {
+      // Fetch savings for the last 7 days from the database or API
+      List<SavingsModel> savings = await savingsController.getSavingsForAccount(userId: userIdInt);
+
+      final weekSavingsProvider = Provider.of<WeekSavingsProvider>(context, listen: false);
+      weekSavingsProvider.weekSavings.resetWeekSavings();
+
+      weekSavingsProvider.updateWeekSavings(savings);  // Update the week savings
+
+      // Debugging: Print the savings for each day after it is updated
+      print("Updated Week Savings: ");
+      for (int i = 0; i < 7; i++) {
+        print("${weekSavingsProvider.weekSavings.weekSavings[i].dayOfWeek}: £${weekSavingsProvider.weekSavings.weekSavings[i].savedAmount.toStringAsFixed(2)}");
       }
-    } catch (e) {
-      print('Error fetching balance: $e');
+
+      setState(() {
+        totalSaved = SavedAmountProvider.totalSavedAmount;
+        progress = (totalSaved / targetAmount).clamp(0.0, 1.0);
+      });
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final weekSavingsProvider = Provider.of<WeekSavingsProvider>(context);
 
-    totalSaved = balance;
-    progress = (totalSaved/targetAmount).clamp(0.0, 1.0);
+    totalSaved = SavedAmountProvider.totalSavedAmount;
+    progress = (totalSaved / targetAmount).clamp(0.0, 1.0);
 
     final List<Widget> _pages = [
-      // Home Page (Balance Display)
+      // Home Page
       SingleChildScrollView(
         child: Column(
           children: [
@@ -74,7 +92,7 @@ class ChildHomePageState extends State<ChildHomePage> {
                   children: [
                     // Balance Title
                     Text(
-                      "Balance",
+                      "Total Saved",
                       style: TextStyle(
                         fontSize: 28,
                         fontWeight: FontWeight.bold,
@@ -85,14 +103,13 @@ class ChildHomePageState extends State<ChildHomePage> {
 
                     // Balance Value
                     Text(
-                      "\£${balance.toStringAsFixed(2)}", // Format balance to 2 decimal places
+                      "£${totalSaved.toStringAsFixed(2)}", // Format balance to 2 decimal places
                       style: TextStyle(
                         fontSize: 36,
                         fontWeight: FontWeight.w600,
-                        color: Default.getTitleColour(), // Highlight balance in green
+                        color: Default.getTitleColour(),
                       ),
                     ),
-                    const SizedBox(height: 30), // Extra space below balance
                   ],
                 ),
               ),
@@ -118,7 +135,6 @@ class ChildHomePageState extends State<ChildHomePage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Week Saved Amounts Title
                     Text(
                       "Saved Amounts (Last 7 Days)",
                       style: TextStyle(
@@ -135,12 +151,14 @@ class ChildHomePageState extends State<ChildHomePage> {
                       child: ListView.builder(
                         itemCount: 7, // Display 7 items (one for each day of the week)
                         itemBuilder: (context, index) {
-                          // Sample data for each day's saved amount
-                          double savedAmount = 50.0 * (index + 1); // Just an example
+                          double savedAmount = weekSavingsProvider.weekSavings.weekSavings[index].savedAmount;
+
+                          String dayLabel = '${weekSavingsProvider.weekSavings.weekSavings[index].dayOfWeek} '
+                              '(${weekSavingsProvider.weekSavings.weekSavings[index].date.toLocal().toString().split(' ')[0]})';
 
                           return ListTile(
-                            title: Text("Day ${index + 1}"),
-                            subtitle: Text("\$${savedAmount.toStringAsFixed(2)}"),
+                            title: Text(dayLabel), // Display the day and date
+                            subtitle: Text("Saved: £${savedAmount.toStringAsFixed(2)}"), // Display the saved amount for that day
                             trailing: Icon(Icons.arrow_forward_ios, size: 18),
                           );
                         },
@@ -150,7 +168,10 @@ class ChildHomePageState extends State<ChildHomePage> {
                 ),
               ),
             ),
-            Padding(padding: const EdgeInsets.all(16.0),
+
+            // Milestone Progress Bar
+            Padding(
+              padding: const EdgeInsets.all(16.0),
               child: Container(
                 padding: EdgeInsets.all(16.0),
                 decoration: BoxDecoration(
@@ -161,14 +182,13 @@ class ChildHomePageState extends State<ChildHomePage> {
                       color: Colors.grey.withOpacity(0.2),
                       spreadRadius: 2,
                       blurRadius: 4,
-                      offset: Offset(0,3),
+                      offset: Offset(0, 3),
                     ),
                   ],
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    //Milestone Progress Title
                     Text(
                       "Milestone Progress",
                       style: TextStyle(
@@ -177,23 +197,16 @@ class ChildHomePageState extends State<ChildHomePage> {
                         color: Default.getTitleColour(),
                       ),
                     ),
-
                     const SizedBox(height: 10),
-
-                    //Progress Bar
+                    // Progress Bar
                     MilestoneProgressBar(totalSaved: totalSaved, targetAmount: targetAmount),
-
-
-
-
                   ],
                 ),
               ),
-            )
+            ),
           ],
         ),
-      )
-,
+      ),
       // Child Milestone Page
       ChildMilestone(),
       // Transfer Page
@@ -236,7 +249,6 @@ class ChildHomePageState extends State<ChildHomePage> {
         currentIndex: _selectedIndex,
         onTap: _onItemTapped,
         type: BottomNavigationBarType.fixed,
-        // Use fixed type to ensure proper layout
         items: const [
           BottomNavigationBarItem(
             icon: Icon(Icons.home),
@@ -256,12 +268,9 @@ class ChildHomePageState extends State<ChildHomePage> {
           ),
         ],
         selectedItemColor: Colors.blue,
-        // Color for selected items
         unselectedItemColor: Colors.grey,
-        // Color for unselected items
         backgroundColor: Colors.white,
-        // Set background color to white for contrast
-        elevation: 10, // Optional: add elevation for better visual separation
+        elevation: 10,
       ),
     );
   }

@@ -5,6 +5,7 @@ import 'package:savings_application/model/accountModel.dart';
 import 'package:savings_application/model/milestoneModel.dart';
 import 'package:savings_application/user/user_account.dart';
 import 'package:savings_application/user/user_id.dart';
+import 'package:savings_application/utils/saved_amount_provider.dart';
 
 class ChildMilestone extends StatefulWidget {
   @override
@@ -15,6 +16,9 @@ class _ChildMilestoneState extends State<ChildMilestone> {
   final MilestoneController controller = MilestoneController();
   String? userId = UserId().userId;
 
+  // Track the total saved amount
+  double totalSavedAmount = 0.0;
+
   final milestoneNameController = TextEditingController();
   final targetAmountController = TextEditingController();
   final completionDateController = TextEditingController();
@@ -24,27 +28,46 @@ class _ChildMilestoneState extends State<ChildMilestone> {
   DateTime _startDate = DateTime.now();
   DateTime? completionDate;
 
-  void selectDate(BuildContext context) async {
-    final DateTime? picked = await showDatePicker(
-      context: context,
-      initialDate: DateTime.now(),
-      firstDate: DateTime.now(),
-      lastDate: DateTime(2100),
-    );
-    if (picked != null && picked != completionDate) {
-      completionDate = picked;
-      completionDateController.text =
-      "${completionDate!.year}-${completionDate!.month.toString().padLeft(2, '0')}-${completionDate!.day.toString().padLeft(2, '0')}";
+  late Future<List<MilestoneModel>> milestonesFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    // Initialize milestonesFuture in initState
+    refreshMilestones(); // Fetch the milestones on initial load
+  }
+
+  // Method to fetch milestones and calculate the total saved amount
+  void refreshMilestones() {
+    final userIdInt = userId != null ? int.tryParse(userId!) : null;
+    if (userIdInt != null) {
+      setState(() {
+        milestonesFuture = controller.getMilestonesForAccount(userId: userIdInt);
+
+        // After fetching the milestones, calculate the total saved amount
+        milestonesFuture.then((milestones) {
+
+          //Reset total and recalculate totalSavedAmount each time they are refreshed
+          totalSavedAmount = 0.0;
+
+          totalSavedAmount = milestones.fold(0.0, (sum, milestone) {
+            return sum + (milestone.savedAmount ?? 0.0); // Sum the saved amounts
+          });
+
+          SavedAmountProvider.resetTotalSavedAmount();
+          SavedAmountProvider.updateSavedAmount(totalSavedAmount); // Update global value
+
+        });
+      });
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final userIdInt = userId != null ? int.tryParse(userId!) : null;
-
     return Scaffold(
+      backgroundColor: Default.getPageBackground(),
       body: FutureBuilder<List<MilestoneModel>>(
-        future: controller.getMilestonesForAccount(userId: userIdInt!),
+        future: milestonesFuture,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Center(child: CircularProgressIndicator());
@@ -76,41 +99,30 @@ class _ChildMilestoneState extends State<ChildMilestone> {
                   ),
                 ],
               ),
-              child: Column(
-                children: [
-                  SizedBox(
-                    height: 450,
-                    child: ListView.builder(
-                      itemCount: milestones.length,
-                      itemBuilder: (context, index) {
-                        final milestone = milestones[index];
-                        return Card(
-                          margin: EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
-                          elevation: 4,
-                          color: Colors.green.shade50,
-                          child: ListTile(
-                            title: Text(milestone.milestoneName),
-                            subtitle: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text("ID: ${milestone.milestoneId ?? "No ID"}"),
-                                Text("Saved: £${milestone.savedAmount.toStringAsFixed(2)}"),
-                                Text("Target: £${milestone.targetAmount.toStringAsFixed(2)}"),
-                              ],
-                            ),
-                          ),
-                        );
-                      },
-                    ),
-                  ),
-                  if (milestones.length > 4)
-                    TextButton(
-                      onPressed: () {
-                        // Show more milestones or expand the list if needed
-                      },
-                      child: Text('See More'),
-                    ),
-                ],
+              child: SizedBox(
+                height: 450,
+                child: ListView.builder(
+                  itemCount: milestones.length,
+                  itemBuilder: (context, index) {
+                    final milestone = milestones[index];
+                    return Card(
+                      margin: EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+                      elevation: 4,
+                      color: Colors.green.shade50,
+                      child: ListTile(
+                        title: Text(milestone.milestoneName),
+                        subtitle: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text("ID: ${milestone.milestoneId ?? "No ID"}"),
+                            Text("Saved: £${milestone.savedAmount.toStringAsFixed(2)}"),
+                            Text("Target: £${milestone.targetAmount.toStringAsFixed(2)}"),
+                          ],
+                        ),
+                      ),
+                    );
+                  },
+                ),
               ),
             ),
           );
@@ -203,7 +215,6 @@ class _ChildMilestoneState extends State<ChildMilestone> {
                 print("Retrieved account: $account");
 
                 if (milestoneName.isNotEmpty) {
-                  // Call your controller to add the milestone (no completionDate)
                   final result = await controller.addMilestone(
                     user: account!,
                     milestoneName: milestoneName,
@@ -214,12 +225,11 @@ class _ChildMilestoneState extends State<ChildMilestone> {
                   if (result) {
                     Navigator.pop(context); // Close dialog on success
 
-                    // Trigger a refresh of the milestone list
                     setState(() {
-                      // Force a refresh here
+                      // Trigger a refresh of the milestone list
+                      refreshMilestones();
                     });
                   } else {
-                    // Show SnackBar if milestone creation fails
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
                         content: Text('Failed to create milestone!'),

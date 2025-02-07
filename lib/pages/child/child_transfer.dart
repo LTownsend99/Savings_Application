@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:savings_application/controller/milestoneController.dart';
+import 'package:provider/provider.dart';  // Import Provider package
 import 'package:savings_application/controller/savings_controller.dart';
+import 'package:savings_application/controller/milestoneController.dart';
 import 'package:savings_application/helpers/date_time_helper.dart';
 import 'package:savings_application/helpers/default.dart';
 import 'package:savings_application/model/accountModel.dart';
 import 'package:savings_application/model/savingsModel.dart';
 import 'package:savings_application/user/user_account.dart';
 import 'package:savings_application/user/user_id.dart';
+import 'package:savings_application/utils/saved_amount_provider.dart';
+import 'package:savings_application/utils/week_savings_provider.dart';  // Import WeekSavingsProvider
 
 class ChildTransfer extends StatefulWidget {
   @override
@@ -43,14 +46,26 @@ class _ChildTransferState extends State<ChildTransfer> {
 
   @override
   Widget build(BuildContext context) {
+    // Access the WeekSavingsProvider using Provider.of
+    WeekSavingsProvider weekSavingsProvider = Provider.of<WeekSavingsProvider>(context);
+
     return Scaffold(
+      backgroundColor: Default.getPageBackground(),
       body: Column(
         children: [
+          Padding(
+            padding: const EdgeInsets.all(14.0),
+            child: Text(
+              "Total Saved: £${SavedAmountProvider.totalSavedAmount.toStringAsFixed(2)}",
+              style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+            ),
+          ),
+
           Padding(
             padding: const EdgeInsets.all(16.0),
             child: ElevatedButton(
               onPressed: () {
-                _showAddMilestoneDialog(context, userId!);
+                _showAddMilestoneDialog(context, userId!, weekSavingsProvider);
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.green,
@@ -85,6 +100,13 @@ class _ChildTransferState extends State<ChildTransfer> {
                 }
 
                 final savings = snapshot.data!;
+
+                // Calculate total savings for all time
+                double totalSavedAmount = savings.fold(0.0, (sum, item) => sum + item.amount);
+
+                // Update the global saved amount
+                SavedAmountProvider.updateSavedAmount(totalSavedAmount);
+
 
                 return Padding(
                   padding: const EdgeInsets.all(16.0),
@@ -136,8 +158,7 @@ class _ChildTransferState extends State<ChildTransfer> {
     );
   }
 
-  void _showAddMilestoneDialog(BuildContext context, String userId) {
-
+  void _showAddMilestoneDialog(BuildContext context, String userId, WeekSavingsProvider weekSavingsProvider) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -206,18 +227,29 @@ class _ChildTransferState extends State<ChildTransfer> {
                   return;
                 }
 
-                // Calculate the targetAmount
+                // Calculate the amount to be added to the savings
                 final amount = pounds + (pence / 100);
 
                 AccountModel? account = UserAccount().getAccount();
                 print("Retrieved account: $account");
 
                 if (amount.toString().isNotEmpty && milestoneId.isNotEmpty) {
-                  // Call your controller to add the savings (no completionDate)
+                  // Add the savings to the correct day of the week
+                  int dayIndex = DateTime.now().weekday - 1; // Get the current day index (1 for Monday, 7 for Sunday)
+
+                  setState(() {
+                    // Update the savings for the current day
+                    weekSavingsProvider.addSavingsToDay(amount, dayIndex);
+                  });
+
+                  // Now update the global saved amount
+                  SavedAmountProvider.updateSavedAmount(amount);
+
+                  // Create the savings entry in the database
                   final result = await savingsController.addSavings(
                       user: account!,
                       amount: amount,
-                      date: startDate,
+                      date: DateTime.now(),
                       milestoneId: int.parse(milestoneId)
                   );
 
@@ -245,7 +277,7 @@ class _ChildTransferState extends State<ChildTransfer> {
                     // Show SnackBar if savings creation fails
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
-                        content: Text('Failed to create milestone!'),
+                        content: Text('Failed to create Savings!'),
                         backgroundColor: Colors.red,
                       ),
                     );
@@ -254,7 +286,6 @@ class _ChildTransferState extends State<ChildTransfer> {
                   print("ERROR: Missing required fields.");
                 }
               },
-
               child: Text('Save'),
             ),
           ],
