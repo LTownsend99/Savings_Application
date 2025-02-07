@@ -6,6 +6,7 @@ import 'package:savings_application/model/milestoneModel.dart';
 import 'package:savings_application/user/user_account.dart';
 import 'package:savings_application/user/user_active_milestone.dart';
 import 'package:savings_application/user/user_id.dart';
+import 'package:savings_application/utils/progress_pie_chart.dart';
 import 'package:savings_application/utils/saved_amount_provider.dart';
 
 class ChildMilestone extends StatefulWidget {
@@ -64,6 +65,8 @@ class _ChildMilestoneState extends State<ChildMilestone> {
 
   @override
   Widget build(BuildContext context) {
+    MilestoneModel? activeMilestone = UserActiveMilestone().getMilestone();
+
     return Scaffold(
       backgroundColor: Default.getPageBackground(),
       body: FutureBuilder<List<MilestoneModel>>(
@@ -100,49 +103,70 @@ class _ChildMilestoneState extends State<ChildMilestone> {
 
           UserActiveMilestone().saveAccount(firstActiveMilestone);
 
-          return Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Container(
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(10),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.grey.withOpacity(0.2),
-                    spreadRadius: 2,
-                    blurRadius: 4,
-                    offset: Offset(0, 3),
-                  ),
-                ],
-              ),
-              child: SizedBox(
-                height: 450,
-                child: ListView.builder(
-                  itemCount: milestones.length,
-                  itemBuilder: (context, index) {
-                    final milestone = milestones[index];
+          // Calculate progress for the pie chart
+          double totalTargetAmount = milestones.fold(0.0, (sum, milestone) {
+            return sum + (milestone.targetAmount ?? 0.0);
+          });
 
-                    return Card(
-                      margin: EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
-                      elevation: 4,
-                      color: getMilestoneColor(milestone.status),
-                      child: ListTile(
-                        title: Text(milestone.milestoneName, style:
-                          TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+          double totalProgress = milestones.fold(0.0, (sum, milestone) {
+            return sum + (milestone.savedAmount ?? 0.0);
+          });
+
+          double progressPercentage = (totalProgress / totalTargetAmount).clamp(0.0, 1.0);
+
+          return SingleChildScrollView(  // Wrap the main body in SingleChildScrollView
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                children: [
+                  // Milestone list
+                  Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(10),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.grey.withOpacity(0.2),
+                          spreadRadius: 2,
+                          blurRadius: 4,
+                          offset: Offset(0, 3),
                         ),
-                        subtitle: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text("ID: ${milestone.milestoneId ?? "No ID"}"),
-                            Text("Saved: £${milestone.savedAmount.toStringAsFixed(2)}"),
-                            Text("Target: £${milestone.targetAmount.toStringAsFixed(2)}"),
-                            Text("Status: ${milestone.status}"),
-                          ],
-                        ),
+                      ],
+                    ),
+                    child: SizedBox(
+                      height: 450,
+                      child: ListView.builder(
+                        itemCount: milestones.length,
+                        itemBuilder: (context, index) {
+                          final milestone = milestones[index];
+
+                          return Card(
+                            margin: EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+                            elevation: 4,
+                            color: getMilestoneColor(milestone.status),
+                            child: ListTile(
+                              title: Text(milestone.milestoneName, style:
+                              TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                              ),
+                              subtitle: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text("ID: ${milestone.milestoneId ?? "No ID"}"),
+                                  Text("Saved: £${milestone.savedAmount.toStringAsFixed(2)}"),
+                                  Text("Target: £${milestone.targetAmount.toStringAsFixed(2)}"),
+                                  Text("Status: ${milestone.status}"),
+                                ],
+                              ),
+                            ),
+                          );
+                        },
                       ),
-                    );
-                  },
-                ),
+                    ),
+                  ),
+                  // Add the PieChart below the milestones list
+                  const SizedBox(height: 20), // Space between list and pie chart
+                  MilestoneProgressChart(milestone: activeMilestone!),
+                ],
               ),
             ),
           );

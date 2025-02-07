@@ -8,7 +8,6 @@ class MilestoneProgressBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
     double savedAmount = milestone.savedAmount;
     double targetAmount = milestone.targetAmount;
     String milestoneName = milestone.milestoneName;
@@ -21,17 +20,16 @@ class MilestoneProgressBar extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // Progress text
-        Row(
-          children: [
-            Text("Milestone Id: $milestoneId ",
-                style: TextStyle(fontSize: 15, fontWeight: FontWeight.w500)
-            ),
-            const SizedBox(width: 25,),
-            Text("Milestone Name: $milestoneName ",
-                style: TextStyle(fontSize: 15, fontWeight: FontWeight.w500)
-            ),
-          ],
+        Text(
+          "Milestone Id: $milestoneId ",
+          style: TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
         ),
+        const SizedBox(width: 25),
+        Text(
+          "Milestone Name: $milestoneName ",
+          style: TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
+        ),
+        const SizedBox(height: 10),
         Text(
           "Total Saved: \£${savedAmount.toStringAsFixed(2)} / Goal: \£${targetAmount.toStringAsFixed(2)}",
           style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
