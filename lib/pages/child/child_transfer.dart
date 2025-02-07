@@ -1,17 +1,23 @@
-
 import 'package:flutter/material.dart';
+import 'package:savings_application/controller/milestoneController.dart';
 import 'package:savings_application/controller/savings_controller.dart';
+import 'package:savings_application/helpers/date_time_helper.dart';
 import 'package:savings_application/helpers/default.dart';
 import 'package:savings_application/model/accountModel.dart';
 import 'package:savings_application/model/savingsModel.dart';
 import 'package:savings_application/user/user_account.dart';
 import 'package:savings_application/user/user_id.dart';
 
-class ChildTransfer extends StatelessWidget {
+class ChildTransfer extends StatefulWidget {
+  @override
+  _ChildTransferState createState() => _ChildTransferState();
+}
 
+class _ChildTransferState extends State<ChildTransfer> {
   final SavingsController savingsController = SavingsController();
+  final MilestoneController milestoneController = MilestoneController();
   String? userId = UserId().userId;
-
+  late Future<List<SavingsModel>> savingsFuture;
 
   final amountController = TextEditingController();
   final milestoneIdController = TextEditingController();
@@ -21,103 +27,111 @@ class ChildTransfer extends StatelessWidget {
   DateTime startDate = DateTime.now();
 
   @override
-  Widget build(BuildContext context) {
+  void initState() {
+    super.initState();
+    refreshSavings();
+  }
 
+  void refreshSavings() {
     final userIdInt = userId != null ? int.tryParse(userId!) : null;
+    if (userIdInt != null) {
+      setState(() {
+        savingsFuture = savingsController.getSavingsForAccount(userId: userIdInt);
+      });
+    }
+  }
 
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
-      body: FutureBuilder<List<SavingsModel>>(
-        // Ensure userId is provided and convert it to int
-        future: savingsController.getSavingsForAccount(userId: userIdInt!),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(
-              child: CircularProgressIndicator(),
-            );
-          } else if (snapshot.hasError) {
-            return Center(
-              child: Text("Error fetching savings: ${snapshot.error}"),
-            );
-          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return Center(
-              child: Text(
-                "No savings found.",
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-            );
-          }
-
-          // Data is available, build the scrollable list
-          final savings = snapshot.data!;
-
-          // Limit the milestones to show up to 4
-          final visibleSavings = savings.take(4).toList();
-
-          return Padding(
+      body: Column(
+        children: [
+          Padding(
             padding: const EdgeInsets.all(16.0),
-            child: Container(
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(10),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.grey.withOpacity(0.2),
-                    spreadRadius: 2,
-                    blurRadius: 4,
-                    offset: Offset(0, 3),
-                  ),
-                ],
+            child: ElevatedButton(
+              onPressed: () {
+                _showAddMilestoneDialog(context, userId!);
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.green,
+                foregroundColor: Colors.white,
+                minimumSize: Size(300, 50),
               ),
-              child: Column(
-                children: [
-                  // Show up to 4 milestones
-                  SizedBox(
-                    height: 450,  // Set a fixed height for the scrollable area
-                    child: ListView.builder(
-                      itemCount: visibleSavings.length,
-                      itemBuilder: (context, index) {
-                        final savings = visibleSavings[index];
-                        return Card(
-                          margin: EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
-                          elevation: 4,
-                          color: Colors.green.shade50,
-                          child: ListTile(
-                            title: Text(savings.savId.toString()),
-                            subtitle: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text("MilestoneId: ${savings.milestoneId ?? "No ID"}"),
-                                Text("Saved: £${savings.amount.toStringAsFixed(2)}"),
-                                Text("Date Saved: ${savings.date.toString()}"),
-                              ],
-                            ),
-                          ),
-                        );
-                      },
-                    ),
-                  ),
-                  // If there are more than 4 milestones, show a scrollable "See More" button
-                  if (savings.length > 4)
-                    TextButton(
-                      onPressed: () {
-                        // Show more milestones by navigating to another screen or expanding the list
-                      },
-                      child: Text('See More'),
-                    ),
-                ],
+              child: Text("Add Savings",
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 22,
+                ),
               ),
             ),
-          );
-        },
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          _showAddMilestoneDialog(context, userId!);
-        },
-        backgroundColor: Default.getTitleColour(),
-        foregroundColor: Colors.white,
-        tooltip: 'Add New Savings',
-        child: Icon(Icons.add),
+          ),
+          Expanded(
+            child: FutureBuilder<List<SavingsModel>>(
+              future: savingsFuture,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return Center(child: CircularProgressIndicator());
+                } else if (snapshot.hasError) {
+                  return Center(
+                    child: Text("Error fetching savings: \${snapshot.error}"),
+                  );
+                } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                  return Center(
+                    child: Text(
+                      "No savings found.",
+                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    ),
+                  );
+                }
+
+                final savings = snapshot.data!;
+
+                return Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(10),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.grey.withOpacity(0.2),
+                          spreadRadius: 2,
+                          blurRadius: 4,
+                          offset: Offset(0, 3),
+                        ),
+                      ],
+                    ),
+                    child: SizedBox(
+                      height: 450, // Set an appropriate height
+                      child: ListView.builder(
+                        itemCount: savings.length,
+                        itemBuilder: (context, index) {
+                          final savingsItem = savings[index];
+                          return Card(
+                            margin: EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+                            elevation: 4,
+                            color: Colors.green.shade50,
+                            child: ListTile(
+                              title: Text(savingsItem.savId.toString()),
+                              subtitle: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text("MilestoneId: ${savingsItem.milestoneId ?? 'No ID'}"),
+                                  Text("Saved: £${savingsItem.amount.toStringAsFixed(2)}"),
+                                  Text("Date Saved: ${convertDateTimeToString(savingsItem.date)}"),
+                                ],
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -199,18 +213,36 @@ class ChildTransfer extends StatelessWidget {
                 print("Retrieved account: $account");
 
                 if (amount.toString().isNotEmpty && milestoneId.isNotEmpty) {
-                  // Call your controller to add the milestone (no completionDate)
-                  final result = savingsController.addSavings(
-                    user: account!,
-                    amount: amount,
-                    date: startDate,
-                    milestoneId: int.parse(milestoneId)
+                  // Call your controller to add the savings (no completionDate)
+                  final result = await savingsController.addSavings(
+                      user: account!,
+                      amount: amount,
+                      date: startDate,
+                      milestoneId: int.parse(milestoneId)
                   );
 
-                  if (await result) {
-                    Navigator.pop(context); // Close dialog on success
+                  if (result) {
+                    // Call updateSavedAmount after successful savings creation
+                    final updateResult = await milestoneController.updateSavedAmount(
+                      milestoneId: int.parse(milestoneId),
+                      addedAmount: amount,
+                    );
+
+                    if (updateResult) {
+                      // Update successful, refresh the savings and pop the context
+                      refreshSavings();
+                      Navigator.pop(context); // Close dialog on success
+                    } else {
+                      // Handle failure to update the saved amount
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('Failed to update saved amount for milestone!'),
+                          backgroundColor: Colors.red,
+                        ),
+                      );
+                    }
                   } else {
-                    // Show SnackBar if milestone creation fails
+                    // Show SnackBar if savings creation fails
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
                         content: Text('Failed to create milestone!'),
@@ -222,6 +254,7 @@ class ChildTransfer extends StatelessWidget {
                   print("ERROR: Missing required fields.");
                 }
               },
+
               child: Text('Save'),
             ),
           ],

@@ -94,6 +94,39 @@ class MilestoneController{
     }
   }
 
+  // Method to update the saved amount for a specific milestone
+  Future<bool> updateSavedAmount({
+    required int milestoneId,
+    required double addedAmount,
+  }) async {
+    try {
+      // Send a PATCH request to update the saved amount for the milestone
+      final response = await http.patch(
+        Uri.parse("${url}$milestoneId/updateSavedAmount"),
+        headers: {"Content-Type": "application/json"},
+        body: jsonEncode({
+          "addedAmount": addedAmount, // Pass the added amount as part of the body
+        }),
+      );
 
-
+      // Check the response status code to determine the result
+      if (response.statusCode == 200) {
+        // Successfully updated the milestone, you can parse the updated data if needed
+        final updatedMilestone = MilestoneModel.fromJson(jsonDecode(response.body));
+        print("Updated Milestone: $updatedMilestone");
+        return true; // Success
+      } else if (response.statusCode == 404) {
+        // Milestone not found
+        print("Milestone with ID $milestoneId not found.");
+      } else if (response.statusCode == 400) {
+        // Invalid amount
+        print("Invalid amount provided for milestone update.");
+      } else {
+        print("Failed to update milestone. Status code: ${response.statusCode}");
+      }
+    } catch (e) {
+      print("Error updating milestone saved amount: $e");
+    }
+    return false; // Return false if something went wrong
+  }
 }

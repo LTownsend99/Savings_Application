@@ -6,10 +6,14 @@ import 'package:savings_application/model/milestoneModel.dart';
 import 'package:savings_application/user/user_account.dart';
 import 'package:savings_application/user/user_id.dart';
 
-class ChildMilestone extends StatelessWidget {
+class ChildMilestone extends StatefulWidget {
+  @override
+  _ChildMilestoneState createState() => _ChildMilestoneState();
+}
+
+class _ChildMilestoneState extends State<ChildMilestone> {
   final MilestoneController controller = MilestoneController();
   String? userId = UserId().userId;
-
 
   final milestoneNameController = TextEditingController();
   final targetAmountController = TextEditingController();
@@ -30,7 +34,7 @@ class ChildMilestone extends StatelessWidget {
     if (picked != null && picked != completionDate) {
       completionDate = picked;
       completionDateController.text =
-      "${completionDate!.year}-${completionDate!.month.toString().padLeft(2, '0')}-${completionDate!.day.toString().padLeft(2, '0')}"; // Update the text field
+      "${completionDate!.year}-${completionDate!.month.toString().padLeft(2, '0')}-${completionDate!.day.toString().padLeft(2, '0')}";
     }
   }
 
@@ -40,17 +44,12 @@ class ChildMilestone extends StatelessWidget {
 
     return Scaffold(
       body: FutureBuilder<List<MilestoneModel>>(
-        // Ensure userId is provided and convert it to int
         future: controller.getMilestonesForAccount(userId: userIdInt!),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(
-              child: CircularProgressIndicator(),
-            );
+            return Center(child: CircularProgressIndicator());
           } else if (snapshot.hasError) {
-            return Center(
-              child: Text("Error fetching milestones: ${snapshot.error}"),
-            );
+            return Center(child: Text("Error fetching milestones: ${snapshot.error}"));
           } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
             return Center(
               child: Text(
@@ -60,11 +59,7 @@ class ChildMilestone extends StatelessWidget {
             );
           }
 
-          // Data is available, build the scrollable list
           final milestones = snapshot.data!;
-
-          // Limit the milestones to show up to 4
-          final visibleMilestones = milestones.take(4).toList();
 
           return Padding(
             padding: const EdgeInsets.all(16.0),
@@ -83,13 +78,12 @@ class ChildMilestone extends StatelessWidget {
               ),
               child: Column(
                 children: [
-                  // Show up to 4 milestones
                   SizedBox(
-                    height: 450,  // Set a fixed height for the scrollable area
+                    height: 450,
                     child: ListView.builder(
-                      itemCount: visibleMilestones.length,
+                      itemCount: milestones.length,
                       itemBuilder: (context, index) {
-                        final milestone = visibleMilestones[index];
+                        final milestone = milestones[index];
                         return Card(
                           margin: EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
                           elevation: 4,
@@ -109,11 +103,10 @@ class ChildMilestone extends StatelessWidget {
                       },
                     ),
                   ),
-                  // If there are more than 4 milestones, show a scrollable "See More" button
                   if (milestones.length > 4)
                     TextButton(
                       onPressed: () {
-                        // Show more milestones by navigating to another screen or expanding the list
+                        // Show more milestones or expand the list if needed
                       },
                       child: Text('See More'),
                     ),
@@ -135,9 +128,7 @@ class ChildMilestone extends StatelessWidget {
     );
   }
 
-
   void _showAddMilestoneDialog(BuildContext context, String userId) {
-
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -172,11 +163,8 @@ class ChildMilestone extends StatelessWidget {
                       child: TextField(
                         controller: penceController,
                         keyboardType: TextInputType.number,
-                        maxLength: 2, // Limit to 2 digits
-                        decoration: InputDecoration(
-                          labelText: 'Pence',
-                          counterText: '', // Hides the character count
-                        ),
+                        maxLength: 2,
+                        decoration: InputDecoration(labelText: 'Pence', counterText: ''),
                       ),
                     ),
                   ],
@@ -199,7 +187,6 @@ class ChildMilestone extends StatelessWidget {
             TextButton(
               onPressed: () async {
                 final milestoneName = milestoneNameController.text;
-                // Parse pounds and pence values
                 final pounds = int.tryParse(poundsController.text) ?? 0;
                 final pence = int.tryParse(penceController.text) ?? 0;
 
@@ -217,15 +204,20 @@ class ChildMilestone extends StatelessWidget {
 
                 if (milestoneName.isNotEmpty) {
                   // Call your controller to add the milestone (no completionDate)
-                  final result = controller.addMilestone(
+                  final result = await controller.addMilestone(
                     user: account!,
                     milestoneName: milestoneName,
                     targetAmount: targetAmount,
                     startDate: _startDate,
                   );
 
-                  if (await result) {
+                  if (result) {
                     Navigator.pop(context); // Close dialog on success
+
+                    // Trigger a refresh of the milestone list
+                    setState(() {
+                      // Force a refresh here
+                    });
                   } else {
                     // Show SnackBar if milestone creation fails
                     ScaffoldMessenger.of(context).showSnackBar(
@@ -246,5 +238,4 @@ class ChildMilestone extends StatelessWidget {
       },
     );
   }
-
 }
