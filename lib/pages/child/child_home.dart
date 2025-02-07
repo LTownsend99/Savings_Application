@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:savings_application/controller/savings_controller.dart';
 import 'package:savings_application/helpers/default.dart';
+import 'package:savings_application/model/milestoneModel.dart';
 import 'package:savings_application/model/savingsModel.dart';
+import 'package:savings_application/user/user_active_milestone.dart';
 import 'package:savings_application/user/user_id.dart';
 import 'package:savings_application/utils/saved_amount_provider.dart';
 import 'package:savings_application/utils/week_savings_provider.dart';  // Import the WeekSavingsProvider
@@ -74,6 +76,9 @@ class ChildHomePageState extends State<ChildHomePage> {
   @override
   Widget build(BuildContext context) {
     final weekSavingsProvider = Provider.of<WeekSavingsProvider>(context);
+
+    MilestoneModel? activeMilestone = UserActiveMilestone().getMilestone();
+
 
     totalSaved = SavedAmountProvider.totalSavedAmount;
     progress = (totalSaved / targetAmount).clamp(0.0, 1.0);
@@ -158,8 +163,8 @@ class ChildHomePageState extends State<ChildHomePage> {
 
                           return ListTile(
                             title: Text(dayLabel), // Display the day and date
-                            subtitle: Text("Saved: £${savedAmount.toStringAsFixed(2)}"), // Display the saved amount for that day
-                            trailing: Icon(Icons.arrow_forward_ios, size: 18),
+                            trailing: Text("Saved: £${savedAmount.toStringAsFixed(2)}",
+                            style: TextStyle(fontSize: 14),), // Display the saved amount for that day
                           );
                         },
                       ),
@@ -199,7 +204,7 @@ class ChildHomePageState extends State<ChildHomePage> {
                     ),
                     const SizedBox(height: 10),
                     // Progress Bar
-                    MilestoneProgressBar(totalSaved: totalSaved, targetAmount: targetAmount),
+                    MilestoneProgressBar(milestone: activeMilestone!,),
                   ],
                 ),
               ),

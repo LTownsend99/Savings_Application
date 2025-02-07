@@ -4,6 +4,7 @@ import 'package:savings_application/helpers/default.dart';
 import 'package:savings_application/model/accountModel.dart';
 import 'package:savings_application/model/milestoneModel.dart';
 import 'package:savings_application/user/user_account.dart';
+import 'package:savings_application/user/user_active_milestone.dart';
 import 'package:savings_application/user/user_id.dart';
 import 'package:savings_application/utils/saved_amount_provider.dart';
 
@@ -16,49 +17,48 @@ class _ChildMilestoneState extends State<ChildMilestone> {
   final MilestoneController controller = MilestoneController();
   String? userId = UserId().userId;
 
-  // Track the total saved amount
   double totalSavedAmount = 0.0;
 
   final milestoneNameController = TextEditingController();
-  final targetAmountController = TextEditingController();
-  final completionDateController = TextEditingController();
   final poundsController = TextEditingController();
   final penceController = TextEditingController();
 
   DateTime _startDate = DateTime.now();
-  DateTime? completionDate;
 
   late Future<List<MilestoneModel>> milestonesFuture;
 
   @override
   void initState() {
     super.initState();
-    // Initialize milestonesFuture in initState
-    refreshMilestones(); // Fetch the milestones on initial load
+    refreshMilestones();
   }
 
-  // Method to fetch milestones and calculate the total saved amount
   void refreshMilestones() {
     final userIdInt = userId != null ? int.tryParse(userId!) : null;
     if (userIdInt != null) {
       setState(() {
         milestonesFuture = controller.getMilestonesForAccount(userId: userIdInt);
 
-        // After fetching the milestones, calculate the total saved amount
         milestonesFuture.then((milestones) {
-
-          //Reset total and recalculate totalSavedAmount each time they are refreshed
-          totalSavedAmount = 0.0;
-
           totalSavedAmount = milestones.fold(0.0, (sum, milestone) {
-            return sum + (milestone.savedAmount ?? 0.0); // Sum the saved amounts
+            return sum + (milestone.savedAmount ?? 0.0);
           });
 
           SavedAmountProvider.resetTotalSavedAmount();
-          SavedAmountProvider.updateSavedAmount(totalSavedAmount); // Update global value
-
+          SavedAmountProvider.updateSavedAmount(totalSavedAmount);
         });
       });
+    }
+  }
+
+  Color getMilestoneColor(String status) {
+    switch (status.toLowerCase()) {
+      case 'completed':
+        return Colors.green.shade200;
+      case 'active':
+        return Colors.blue.shade200;
+      default:
+        return Colors.grey.shade300;
     }
   }
 
@@ -84,6 +84,22 @@ class _ChildMilestoneState extends State<ChildMilestone> {
 
           final milestones = snapshot.data!;
 
+          //  Sort milestones: Active first, then Completed
+          milestones.sort((a, b) {
+            if (a.status.toLowerCase() == 'active' && b.status.toLowerCase() != 'active') {
+              return -1; // "Active" comes first
+            } else if (a.status.toLowerCase() != 'active' && b.status.toLowerCase() == 'active') {
+              return 1; // "Completed" comes later
+            }
+            return 0; // Maintain original order otherwise
+          });
+
+          MilestoneModel? firstActiveMilestone = milestones.firstWhere(
+                (m) => m.status.toLowerCase() == 'active',
+          );
+
+          UserActiveMilestone().saveAccount(firstActiveMilestone);
+
           return Padding(
             padding: const EdgeInsets.all(16.0),
             child: Container(
@@ -105,18 +121,22 @@ class _ChildMilestoneState extends State<ChildMilestone> {
                   itemCount: milestones.length,
                   itemBuilder: (context, index) {
                     final milestone = milestones[index];
+
                     return Card(
                       margin: EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
                       elevation: 4,
-                      color: Colors.green.shade50,
+                      color: getMilestoneColor(milestone.status),
                       child: ListTile(
-                        title: Text(milestone.milestoneName),
+                        title: Text(milestone.milestoneName, style:
+                          TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                        ),
                         subtitle: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text("ID: ${milestone.milestoneId ?? "No ID"}"),
                             Text("Saved: £${milestone.savedAmount.toStringAsFixed(2)}"),
                             Text("Target: £${milestone.targetAmount.toStringAsFixed(2)}"),
+                            Text("Status: ${milestone.status}"),
                           ],
                         ),
                       ),
@@ -153,7 +173,7 @@ class _ChildMilestoneState extends State<ChildMilestone> {
                 TextFormField(
                   decoration: InputDecoration(labelText: 'User ID'),
                   initialValue: userId,
-                  enabled: false, // User ID should not be editable
+                  enabled: false,
                 ),
                 TextField(
                   controller: milestoneNameController,
@@ -184,7 +204,7 @@ class _ChildMilestoneState extends State<ChildMilestone> {
                 TextFormField(
                   decoration: InputDecoration(labelText: 'Start Date'),
                   initialValue: "${_startDate.toLocal()}".split(' ')[0],
-                  enabled: false, // Start date should not be editable
+                  enabled: false,
                 ),
               ],
             ),
@@ -202,15 +222,12 @@ class _ChildMilestoneState extends State<ChildMilestone> {
                 final pounds = int.tryParse(poundsController.text) ?? 0;
                 final pence = int.tryParse(penceController.text) ?? 0;
 
-                // Ensure pence is between 0 and 99
                 if (pence < 0 || pence > 99) {
                   print("Pence must be between 0 and 99");
                   return;
                 }
 
-                // Calculate the targetAmount
                 final targetAmount = pounds + (pence / 100);
-
                 AccountModel? account = UserAccount().getAccount();
                 print("Retrieved account: $account");
 
@@ -223,10 +240,8 @@ class _ChildMilestoneState extends State<ChildMilestone> {
                   );
 
                   if (result) {
-                    Navigator.pop(context); // Close dialog on success
-
+                    Navigator.pop(context);
                     setState(() {
-                      // Trigger a refresh of the milestone list
                       refreshMilestones();
                     });
                   } else {
