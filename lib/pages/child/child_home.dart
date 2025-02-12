@@ -5,6 +5,7 @@ import 'package:savings_application/helpers/default.dart';
 import 'package:savings_application/model/accountModel.dart';
 import 'package:savings_application/model/milestoneModel.dart';
 import 'package:savings_application/model/savingsModel.dart';
+import 'package:savings_application/pages/settings.dart';
 import 'package:savings_application/user/user_account.dart';
 import 'package:savings_application/user/user_active_milestone.dart';
 import 'package:savings_application/user/user_id.dart';
@@ -219,19 +220,7 @@ class ChildHomePageState extends State<ChildHomePage> {
       // Transfer Page
       ChildTransfer(),
       // Settings Page
-      Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.settings, size: 100, color: Colors.orange),
-            SizedBox(height: 20),
-            Text(
-              'This is the Settings Page.',
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-            ),
-          ],
-        ),
-      ),
+      SettingsPage(),
     ];
 
     return Scaffold(
