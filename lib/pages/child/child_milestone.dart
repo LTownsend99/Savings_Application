@@ -176,10 +176,10 @@ class _ChildMilestoneState extends State<ChildMilestone> {
         onPressed: () {
           _showAddMilestoneDialog(context, userId!);
         },
-        child: Icon(Icons.add),
         backgroundColor: Default.getTitleColour(),
         foregroundColor: Colors.white,
         tooltip: 'Add New Milestone',
+        child: Icon(Icons.add),
       ),
     );
   }
@@ -242,6 +242,25 @@ class _ChildMilestoneState extends State<ChildMilestone> {
             ),
             TextButton(
               onPressed: () async {
+                // Check if an active milestone exists before saving
+                MilestoneModel? activeMilestone = UserActiveMilestone().getMilestone();
+
+                if (activeMilestone != null && activeMilestone.status.toLowerCase() == 'active') {
+                  // Show message and prevent saving
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        'You already have an active milestone. Please complete this milestone before creating a new one.',
+                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                      ),
+                      backgroundColor: Colors.red,
+                      duration: Duration(seconds: 3), // Message disappears after 3 seconds
+                    ),
+                  );
+                  return; // Exit function, prevent milestone creation
+                }
+
+                // If no active milestone, proceed with saving
                 final milestoneName = milestoneNameController.text;
                 final pounds = int.tryParse(poundsController.text) ?? 0;
                 final pence = int.tryParse(penceController.text) ?? 0;
@@ -287,4 +306,5 @@ class _ChildMilestoneState extends State<ChildMilestone> {
       },
     );
   }
+
 }
