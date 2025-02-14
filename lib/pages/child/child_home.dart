@@ -56,31 +56,47 @@ class ChildHomePageState extends State<ChildHomePage> {
     setState(() {});
   }
 
-  // Method to update weekly savings on page load
   void updateWeeklySavings() async {
     final userIdInt = userId != null ? int.tryParse(userId!) : null;
 
     if (userIdInt != null) {
-      // Fetch savings for the last 7 days from the database or API
+      // Fetch all available savings from API
       List<SavingsModel> savings = await savingsController.getSavingsForAccount(userId: userIdInt);
 
       final weekSavingsProvider = Provider.of<WeekSavingsProvider>(context, listen: false);
+
+      // Reset savings before updating
       weekSavingsProvider.weekSavings.resetWeekSavings();
 
-      weekSavingsProvider.updateWeekSavings(savings);  // Update the week savings
+      // Get the start of the current week (Monday)
+      DateTime today = DateTime.now();
+      DateTime startOfWeek = today.subtract(Duration(days: today.weekday - 1));
+      DateTime endOfWeek = startOfWeek.add(Duration(days: 6)); // Sunday
 
-      // Debugging: Print the savings for each day after it is updated
-      print("Updated Week Savings: ");
+      // Filter only this week's savings
+      List<SavingsModel> thisWeeksSavings = savings.where((saving) {
+        DateTime savingDate = saving.date;
+        return savingDate.isAfter(startOfWeek.subtract(Duration(seconds: 1))) &&
+            savingDate.isBefore(endOfWeek.add(Duration(days: 1)));
+      }).toList();
+
+      // Update provider with only this week's data
+      weekSavingsProvider.updateWeekSavings(thisWeeksSavings);
+
+      // Debugging: Print the filtered savings
+      print("Filtered Week Savings (This Week Only): ");
       for (int i = 0; i < 7; i++) {
         print("${weekSavingsProvider.weekSavings.weekSavings[i].dayOfWeek}: £${weekSavingsProvider.weekSavings.weekSavings[i].savedAmount.toStringAsFixed(2)}");
       }
 
+      // Update UI state
       setState(() {
         totalSaved = SavedAmountProvider.totalSavedAmount;
         progress = (totalSaved / targetAmount).clamp(0.0, 1.0);
       });
     }
   }
+
 
   @override
   Widget build(BuildContext context) {

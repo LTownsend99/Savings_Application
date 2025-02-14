@@ -21,8 +21,17 @@ class WeekSavingsProvider extends ChangeNotifier {
   }
 
   void updateWeekSavings(List<SavingsModel> savings) {
+    DateTime today = DateTime.now();
+    DateTime startOfWeek = today.subtract(Duration(days: today.weekday - 1));
+
     for (var saving in savings) {
       DateTime savingDate = saving.date;
+
+      // Ignore savings from previous weeks
+      if (savingDate.isBefore(startOfWeek)) {
+        continue;
+      }
+
       int dayIndex = (savingDate.weekday - 1) % 7;
       addSavingsToDay(saving.amount, dayIndex);
     }

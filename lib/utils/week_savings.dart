@@ -7,13 +7,20 @@ class WeekSavings {
     DateTime today = DateTime.now();
     int currentWeekday = today.weekday; // 1 = Monday, 7 = Sunday
 
-    // Initialize the week with savings data for each day of the week
+    // Get the start of this week's Monday
+    DateTime startOfWeek = today.subtract(Duration(days: currentWeekday - 1));
+
+    // Clear previous data (if it persists between app reloads)
+    weekSavings.clear();
+
     for (int i = 0; i < 7; i++) {
-      DateTime dateForDay = today.subtract(Duration(days: currentWeekday - 1 - i));
-      print("Day $i: ${dateForDay.toLocal()}"); // Print date for each day of the week
+      DateTime dateForDay = startOfWeek.add(Duration(days: i));
+
+      print(
+          "Initializing: ${DaySavings.getDayOfWeek(dateForDay.weekday - 1)} - ${dateForDay.toLocal()}");
 
       weekSavings.add(DaySavings(
-        dayOfWeek: DaySavings.getDayOfWeek(i),
+        dayOfWeek: DaySavings.getDayOfWeek(dateForDay.weekday - 1),
         date: dateForDay,
       ));
     }
@@ -22,7 +29,8 @@ class WeekSavings {
   // Add savings to a specific day of the week
   void addSavingsToDay(double amount, int dayIndex) {
     if (dayIndex >= 0 && dayIndex < 7) {
-      weekSavings[dayIndex].addSavings(amount);  // Update the savings for that day
+      weekSavings[dayIndex]
+          .addSavings(amount); // Update the savings for that day
     }
   }
 
@@ -45,7 +53,7 @@ class WeekSavings {
 
   // Get the current day's index (0 for Monday, 6 for Sunday)
   int getCurrentDayIndex() {
-    return DateTime.now().weekday - 1;  // 1 = Monday, 7 = Sunday
+    return DateTime.now().weekday - 1; // 1 = Monday, 7 = Sunday
   }
 
   // Method to reset the weekly savings
