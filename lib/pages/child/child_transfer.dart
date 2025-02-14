@@ -265,31 +265,33 @@ class _ChildTransferState extends State<ChildTransfer> {
                   // Add the savings to the correct day of the week
                   int dayIndex = DateTime.now().weekday - 1; // Get the current day index (1 for Monday, 7 for Sunday)
 
-                  setState(() {
-                    // Update the savings for the current day
-                    weekSavingsProvider.addSavingsToDay(amount, dayIndex);
-                  });
 
                   // Now update the global saved amount
                   SavedAmountProvider.updateSavedAmount(amount);
 
-                  // Create the savings entry in the database
-                  final result = await savingsController.addSavings(
-                      user: account!,
-                      amount: amount,
-                      date: DateTime.now(),
-                      milestoneId: int.parse(milestoneId)
+                  // Call updateSavedAmount after successful savings creation
+                  final updateResult = await milestoneController.updateSavedAmount(
+                    milestoneId: int.parse(milestoneId),
+                    addedAmount: amount,
                   );
 
-                  if (result) {
-                    // Call updateSavedAmount after successful savings creation
-                    final updateResult = await milestoneController.updateSavedAmount(
-                      milestoneId: int.parse(milestoneId),
-                      addedAmount: amount,
+
+                  if (updateResult) {
+                    // Create the savings entry in the database
+                    final result = await savingsController.addSavings(
+                        user: account!,
+                        amount: amount,
+                        date: DateTime.now(),
+                        milestoneId: int.parse(milestoneId)
                     );
 
-                    if (updateResult) {
-                      // Update successful, refresh the savings and pop the context
+                    if (result) {
+
+                      setState(() {
+                        // Update the savings for the current day
+                        weekSavingsProvider.addSavingsToDay(amount, dayIndex);
+                      });
+
                       refreshSavings();
                       Navigator.pop(context); // Close dialog on success
                     } else {
