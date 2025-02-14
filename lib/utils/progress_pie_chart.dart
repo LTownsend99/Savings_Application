@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:pie_chart/pie_chart.dart'; // Import the pie chart package
-import 'package:savings_application/helpers/default.dart';
+import 'package:savings_application/helpers/helpers.dart';
 import 'package:savings_application/model/milestoneModel.dart';
 
 class MilestoneProgressChart extends StatelessWidget {
@@ -39,17 +39,17 @@ class MilestoneProgressChart extends StatelessWidget {
           // Milestone details
           Text(
             "Milestone Id: $milestoneId ",
-            style: TextStyle(fontSize: 15, fontWeight: FontWeight.w500, color: Default.getTitleColour()),
+            style: TextStyle(fontSize: 15, fontWeight: FontWeight.w500, color: Helpers.getTitleColour()),
           ),
           const SizedBox(height: 5),
           Text(
             "Milestone Name: $milestoneName ",
-            style: TextStyle(fontSize: 15, fontWeight: FontWeight.w500, color: Default.getTitleColour()),
+            style: TextStyle(fontSize: 15, fontWeight: FontWeight.w500, color: Helpers.getTitleColour()),
           ),
           const SizedBox(height: 5),
           Text(
             "Total Saved: \£${savedAmount.toStringAsFixed(2)} / Goal: \£${targetAmount.toStringAsFixed(2)}",
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500, color: Default.getTitleColour()),
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500, color: Helpers.getTitleColour()),
           ),
           const SizedBox(height: 20), // Space between text and pie chart
 

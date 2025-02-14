@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:savings_application/controller/account_controller.dart';
-import 'package:savings_application/helpers/default.dart';
+import 'package:savings_application/helpers/helpers.dart';
 import 'package:savings_application/model/accountModel.dart';
 import 'package:savings_application/pages/child/child_home.dart';
 import 'package:savings_application/pages/parent/parent_home.dart';
@@ -17,7 +17,7 @@ class LoginPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Default.getPageBackground(),
+      backgroundColor: Helpers.getPageBackground(),
       appBar: AppBar(
         title: Text(
           'Login Page',
@@ -42,7 +42,7 @@ class LoginPage extends StatelessWidget {
             'Login',
             style: TextStyle(
                 fontSize: 30,
-                color: Default.getTitleColour(),
+                color: Helpers.getTitleColour(),
                 fontWeight: FontWeight.bold),
           ),
           Padding(
@@ -137,7 +137,7 @@ class LoginPage extends StatelessWidget {
                           }
                         }
                       },
-                      color: Default.getTitleColour(),
+                      color: Helpers.getTitleColour(),
                       textColor: Colors.white,
                       child: Text(
                         'Login',
@@ -159,7 +159,7 @@ class LoginPage extends StatelessWidget {
                               builder: (context) => RegisterPage()),
                         );
                       },
-                      color: Default.getTitleColour(),
+                      color: Helpers.getTitleColour(),
                       textColor: Colors.white,
                       child: Text(
                         'Register',

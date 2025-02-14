@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';  // Import Provider package
 import 'package:savings_application/controller/savings_controller.dart';
 import 'package:savings_application/controller/milestoneController.dart';
 import 'package:savings_application/helpers/date_time_helper.dart';
-import 'package:savings_application/helpers/default.dart';
+import 'package:savings_application/helpers/helpers.dart';
 import 'package:savings_application/model/accountModel.dart';
 import 'package:savings_application/model/milestoneModel.dart';
 import 'package:savings_application/model/savingsModel.dart';
@@ -56,7 +56,7 @@ class _ChildTransferState extends State<ChildTransfer> {
     WeekSavingsProvider weekSavingsProvider = Provider.of<WeekSavingsProvider>(context);
 
     return Scaffold(
-      backgroundColor: Default.getPageBackground(),
+      backgroundColor: Helpers.getPageBackground(),
       body: Column(
         children: [
           Padding(

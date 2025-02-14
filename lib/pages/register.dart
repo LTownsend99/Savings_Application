@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:savings_application/controller/account_controller.dart';
 import 'package:savings_application/helpers/date_time_helper.dart';
-import 'package:savings_application/helpers/default.dart';
+import 'package:savings_application/helpers/helpers.dart';
 
 class RegisterPage extends StatelessWidget {
   final newDateController = TextEditingController();
@@ -35,7 +35,7 @@ class RegisterPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Default.getPageBackground(),
+      backgroundColor: Helpers.getPageBackground(),
       appBar: AppBar(
         flexibleSpace: Container(
           decoration: BoxDecoration(
@@ -57,7 +57,7 @@ class RegisterPage extends StatelessWidget {
                 "Let's create an account",
                 style: TextStyle(
                     fontSize: 30,
-                    color: Default.getTitleColour(),
+                    color: Helpers.getTitleColour(),
                     fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 20),
@@ -322,7 +322,7 @@ class RegisterPage extends StatelessWidget {
                             }
                           }
                         },
-                        color: Default.getTitleColour(),
+                        color: Helpers.getTitleColour(),
                         textColor: Colors.white,
                         child: Text(
                           'Create Account',

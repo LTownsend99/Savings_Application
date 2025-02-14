@@ -17,7 +17,7 @@ class UserActiveMilestone {
 
   UserActiveMilestone._internal();
 
-  void saveAccount(MilestoneModel milestone) {
+  void saveMilestone(MilestoneModel milestone) {
     print("Saving milestone: ${milestone.milestoneName} ${milestone.status}"); // Debug print
 
     milestoneModel = milestone;

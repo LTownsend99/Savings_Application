@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:savings_application/controller/savings_controller.dart';
-import 'package:savings_application/helpers/default.dart';
+import 'package:savings_application/helpers/helpers.dart';
 import 'package:savings_application/model/milestoneModel.dart';
 import 'package:savings_application/model/savingsModel.dart';
 import 'package:savings_application/pages/settings.dart';
@@ -114,7 +114,7 @@ class ChildHomePageState extends State<ChildHomePage> {
                       style: TextStyle(
                         fontSize: 36,
                         fontWeight: FontWeight.w600,
-                        color: Default.getTitleColour(),
+                        color: Helpers.getTitleColour(),
                       ),
                     ),
                   ],
@@ -150,7 +150,7 @@ class ChildHomePageState extends State<ChildHomePage> {
                       style: TextStyle(
                         fontSize: 22,
                         fontWeight: FontWeight.bold,
-                        color: Default.getTitleColour(),
+                        color: Helpers.getTitleColour(),
                       ),
                     ),
                     const SizedBox(height: 10), // Space between title and list
@@ -204,7 +204,7 @@ class ChildHomePageState extends State<ChildHomePage> {
                       style: TextStyle(
                         fontSize: 22,
                         fontWeight: FontWeight.bold,
-                        color: Default.getTitleColour(),
+                        color: Helpers.getTitleColour(),
                       ),
                     ),
                     const SizedBox(height: 10),
@@ -226,7 +226,7 @@ class ChildHomePageState extends State<ChildHomePage> {
     ];
 
     return Scaffold(
-      backgroundColor: Default.getPageBackground(),
+      backgroundColor: Helpers.getPageBackground(),
       appBar: AppBar(
         title: Text(
           _titles[_selectedIndex],

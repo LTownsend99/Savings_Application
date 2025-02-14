@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:savings_application/controller/milestoneController.dart';
-import 'package:savings_application/helpers/default.dart';
+import 'package:savings_application/helpers/helpers.dart';
 import 'package:savings_application/model/accountModel.dart';
 import 'package:savings_application/model/milestoneModel.dart';
 import 'package:savings_application/user/user_account.dart';
@@ -52,23 +52,12 @@ class _ChildMilestoneState extends State<ChildMilestone> {
     }
   }
 
-  Color getMilestoneColor(String status) {
-    switch (status.toLowerCase()) {
-      case 'completed':
-        return Colors.green.shade200;
-      case 'active':
-        return Colors.blue.shade200;
-      default:
-        return Colors.grey.shade300;
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     MilestoneModel? activeMilestone = UserActiveMilestone().getMilestone();
 
     return Scaffold(
-      backgroundColor: Default.getPageBackground(),
+      backgroundColor: Helpers.getPageBackground(),
       body: FutureBuilder<List<MilestoneModel>>(
         future: milestonesFuture,
         builder: (context, snapshot) {
@@ -101,7 +90,7 @@ class _ChildMilestoneState extends State<ChildMilestone> {
                 (m) => m.status.toLowerCase() == 'active',
           );
 
-          UserActiveMilestone().saveAccount(firstActiveMilestone);
+          UserActiveMilestone().saveMilestone(firstActiveMilestone);
 
           // Calculate progress for the pie chart
           double totalTargetAmount = milestones.fold(0.0, (sum, milestone) {
@@ -143,7 +132,7 @@ class _ChildMilestoneState extends State<ChildMilestone> {
                           return Card(
                             margin: EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
                             elevation: 4,
-                            color: getMilestoneColor(milestone.status),
+                            color: Helpers.getMilestoneColor(milestone.status),
                             child: ListTile(
                               title: Text(milestone.milestoneName, style:
                               TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
@@ -176,7 +165,7 @@ class _ChildMilestoneState extends State<ChildMilestone> {
         onPressed: () {
           _showAddMilestoneDialog(context, userId!);
         },
-        backgroundColor: Default.getTitleColour(),
+        backgroundColor: Helpers.getTitleColour(),
         foregroundColor: Colors.white,
         tooltip: 'Add New Milestone',
         child: Icon(Icons.add),

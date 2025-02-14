@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:savings_application/controller/account_controller.dart';
-import 'package:savings_application/helpers/default.dart';
+import 'package:savings_application/helpers/helpers.dart';
 import 'package:savings_application/model/accountModel.dart';
+import 'package:savings_application/model/milestoneModel.dart';
+import 'package:savings_application/pages/parent/parent_milestone.dart';
 import 'package:savings_application/pages/settings.dart';
 import 'package:savings_application/user/user_account.dart';
+import 'package:savings_application/user/user_active_milestone.dart';
 import 'package:savings_application/user/user_id.dart';
 import 'package:savings_application/utils/parent_savings_tips.dart';
+import 'package:savings_application/utils/progress_pie_chart.dart';
 
 class ParentHomePage extends StatefulWidget {
   @override
@@ -23,7 +27,7 @@ class ParentHomePageState extends State<ParentHomePage> {
   // List of titles for the AppBar
   final List<String> _titles = [
     'Home',
-    'Search',
+    'Milestone',
     'Settings',
   ];
 
@@ -56,6 +60,9 @@ class ParentHomePageState extends State<ParentHomePage> {
   @override
   Widget build(BuildContext context) {
 
+    MilestoneModel? activeMilestone = UserActiveMilestone().getMilestone();
+
+
     // List of pages for navigation
     final List<Widget> _pages = [
       SingleChildScrollView(
@@ -85,7 +92,7 @@ class ParentHomePageState extends State<ParentHomePage> {
                       style: TextStyle(
                         fontSize: 22,
                         fontWeight: FontWeight.bold,
-                        color: Default.getTitleColour(),
+                        color: Helpers.getTitleColour(),
                       ),
                     ),
                     const SizedBox(height: 10),
@@ -93,35 +100,36 @@ class ParentHomePageState extends State<ParentHomePage> {
                       ListTile(
                         title: Text(
                           "${childAccount!.firstName} ${childAccount!.lastName}",
-                          style: TextStyle(color:  Default.getTitleColour(),),
+                          style: TextStyle(color:  Helpers.getTitleColour(),),
                         ),
                         subtitle: Text(
                           "User ID: ${childAccount!.userId}\nDOB: ${childAccount!.dateOfBirth?.toLocal().toString().split(' ')[0] ?? 'N/A'}",
-                          style: TextStyle(color:  Default.getTitleColour(),),
+                          style: TextStyle(color:  Helpers.getTitleColour(),),
                         ),
                       )
                     else
                       Text(
                         "No child account found",
-                        style: TextStyle(color:  Default.getTitleColour(),),
+                        style: TextStyle(color:  Helpers.getTitleColour(),),
                       ),
                   ],
                 ),
               ),
             ),
             ParentSavingsTipsBox(),
+
+            MilestoneProgressChart(milestone: activeMilestone!),
+
           ],
         ),
       ),
-
-      Center(child: Text('Search Page')),
-
+      ParentMilestonePage(),
       SettingsPage(),
     ];
 
 
     return Scaffold(
-      backgroundColor: Default.getPageBackground(),
+      backgroundColor: Helpers.getPageBackground(),
       appBar: AppBar(
         title: Text(
           _titles[_selectedIndex],
