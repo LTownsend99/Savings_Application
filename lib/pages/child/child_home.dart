@@ -10,6 +10,7 @@ import 'package:savings_application/user/user_account.dart';
 import 'package:savings_application/user/user_active_milestone.dart';
 import 'package:savings_application/user/user_id.dart';
 import 'package:savings_application/utils/saved_amount_provider.dart';
+import 'package:savings_application/utils/savings_tips.dart';
 import 'package:savings_application/utils/week_savings_provider.dart';  // Import the WeekSavingsProvider
 import 'package:savings_application/utils/progress_bar.dart';
 import 'child_milestone.dart';
@@ -122,6 +123,9 @@ class ChildHomePageState extends State<ChildHomePage> {
                 ),
               ),
             ),
+
+            //SavingsTips
+            SavingsTipsBox(),
 
             // Container for the list of saved amounts over the last week
             Padding(
