@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:savings_application/controller/account_controller.dart';
 import 'package:savings_application/controller/milestoneController.dart';
+import 'package:savings_application/controller/savings_controller.dart';
 import 'package:savings_application/helpers/helpers.dart';
+import 'package:savings_application/model/accountModel.dart';
 import 'package:savings_application/model/milestoneModel.dart';
 import 'package:savings_application/user/user_account.dart';
 import 'package:savings_application/user/user_active_milestone.dart';
@@ -12,23 +15,43 @@ class ParentMilestonePage extends StatefulWidget {
 }
 
 class _ParentMilestoneState extends State<ParentMilestonePage> {
-  final MilestoneController controller = MilestoneController();
+  final MilestoneController milestoneController = MilestoneController();
+  final SavingsController savingsController = SavingsController();
+  final AccountController accountController = AccountController();
   String? userId = UserId().userId;
   String? childId = UserAccount().userAccount?.childId.toString();
+  AccountModel? childAccount;
 
   late Future<List<MilestoneModel>> milestonesFuture;
+
+  final poundsController = TextEditingController();
+  final penceController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
     refreshMilestones();
+    fetchChildAccount();
   }
 
   void refreshMilestones() {
     final childIdInt = childId != null ? int.tryParse(childId!) : null;
     if (childIdInt != null) {
       setState(() {
-        milestonesFuture = controller.getMilestonesForAccount(userId: childIdInt);
+        milestonesFuture = milestoneController.getMilestonesForAccount(userId: childIdInt);
+      });
+    }
+  }
+
+  Future<void> fetchChildAccount() async {
+    final childIdInt = childId != null ? int.tryParse(childId!) : null;
+    print("Parsed childIdInt: $childIdInt");
+
+    if (childIdInt != null) {
+      print("Fetching child account for userId: $childIdInt");
+      AccountModel? account = await accountController.getChildAccountForAccount(userId: childIdInt);
+      setState(() {
+        childAccount = account;
       });
     }
   }
@@ -127,21 +150,23 @@ class _ParentMilestoneState extends State<ParentMilestonePage> {
                               ),
                             ),
                           ),
-                          Padding(
-                            padding: const EdgeInsets.all(16.0),
-                            child: ElevatedButton(
-                              onPressed: () {
-                                _showAddSavingsDialog(context, userId!);
-                              },
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.green,
-                                foregroundColor: Colors.white,
-                                minimumSize: Size(300, 50),
-                              ),
-                              child: Text("Add Savings",
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 22,
+                          Center(
+                            child: Padding(
+                              padding: const EdgeInsets.all(16.0),
+                              child: ElevatedButton(
+                                onPressed: () {
+                                  _showAddSavingsDialog(context, userId!);
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.green,
+                                  foregroundColor: Colors.white,
+                                  minimumSize: Size(300, 50),
+                                ),
+                                child: Text("Add Savings",
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 22,
+                                  ),
                                 ),
                               ),
                             ),
@@ -222,6 +247,144 @@ class _ParentMilestoneState extends State<ParentMilestonePage> {
           );
         },
       ),
+    );
+  }
+
+  void _showAddSavingsDialog(BuildContext context, String userId) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+
+        MilestoneModel? activeMilestone = UserActiveMilestone().getMilestone();
+
+
+        return AlertDialog(
+          title: Text('Add New Savings'),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextFormField(
+                  decoration: InputDecoration(labelText: 'Child ID'),
+                  initialValue: childId,
+                  enabled: false, // User ID should not be editable
+                ),
+                TextFormField(
+                  decoration: InputDecoration(labelText: 'Milestone ID'),
+                  initialValue: activeMilestone!.milestoneId.toString(),
+                  enabled: false,
+                ),
+                Row(
+                  children: [
+                    Expanded(
+                      flex: 2,
+                      child: TextField(
+                        controller: poundsController,
+                        keyboardType: TextInputType.number,
+                        decoration: InputDecoration(labelText: 'Pounds (£)'),
+                      ),
+                    ),
+                    SizedBox(width: 8),
+                    Expanded(
+                      flex: 1,
+                      child: TextField(
+                        controller: penceController,
+                        keyboardType: TextInputType.number,
+                        maxLength: 2, // Limit to 2 digits
+                        decoration: InputDecoration(
+                          labelText: 'Pence',
+                          counterText: '', // Hides the character count
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () async {
+                // Parse pounds and pence values
+                final pounds = int.tryParse(poundsController.text) ?? 0;
+                final pence = int.tryParse(penceController.text) ?? 0;
+
+                final milestoneId = activeMilestone.milestoneId.toString();
+
+                // Ensure pence is between 0 and 99
+                if (pence < 0 || pence > 99) {
+                  print("Pence must be between 0 and 99");
+                  return;
+                }
+
+                // Calculate the amount to be added to the savings
+                final amount = pounds + (pence / 100);
+
+                print("Retrieved account: $childAccount");
+
+                if (amount.toString().isNotEmpty && milestoneId.isNotEmpty) {
+                  // Add the savings to the correct day of the week
+                  int dayIndex = DateTime.now().weekday - 1; // Get the current day index (1 for Monday, 7 for Sunday)
+
+                  /*setState(() {
+                    // Update the savings for the current day
+                    weekSavingsProvider.addSavingsToDay(amount, dayIndex);
+                  });
+
+                  // Now update the global saved amount
+                  SavedAmountProvider.updateSavedAmount(amount);*/
+
+                  // Create the savings entry in the database
+                  final result = await savingsController.addSavings(
+                      user: childAccount!,
+                      amount: amount,
+                      date: DateTime.now(),
+                      milestoneId: int.parse(milestoneId)
+                  );
+
+                  if (result) {
+                    // Call updateSavedAmount after successful savings creation
+                    final updateResult = await milestoneController.updateSavedAmount(
+                      milestoneId: int.parse(milestoneId),
+                      addedAmount: amount,
+                    );
+
+                    if (updateResult) {
+                      // Update successful, refresh the savings and pop the context
+                      Navigator.pop(context); // Close dialog on success
+                    } else {
+                      // Handle failure to update the saved amount
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('Failed to update saved amount for milestone!'),
+                          backgroundColor: Colors.red,
+                        ),
+                      );
+                    }
+                  } else {
+                    // Show SnackBar if savings creation fails
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text('Failed to create Savings!'),
+                        backgroundColor: Colors.red,
+                      ),
+                    );
+                  }
+                } else {
+                  print("ERROR: Missing required fields.");
+                }
+              },
+              child: Text('Save'),
+            ),
+          ],
+        );
+      },
     );
   }
 
