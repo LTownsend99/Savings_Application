@@ -22,6 +22,7 @@ class ChildHomePage extends StatefulWidget {
 class ChildHomePageState extends State<ChildHomePage> {
   SavingsController savingsController = SavingsController();
   String? userId = UserId().userId;
+  MilestoneModel? activeMilestone;
 
   int _selectedIndex = 0;
   late double totalSaved;
@@ -47,6 +48,12 @@ class ChildHomePageState extends State<ChildHomePage> {
   void initState() {
     super.initState();
     updateWeeklySavings(); // Update weekly savings when the page is loaded
+    fetchActiveMilestone();
+  }
+
+  Future<void> fetchActiveMilestone() async {
+    activeMilestone = await UserActiveMilestone().getMilestone(); // Assuming you have a method to fetch active milestone
+    setState(() {});
   }
 
   // Method to update weekly savings on page load

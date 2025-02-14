@@ -294,21 +294,26 @@ class _ChildTransferState extends State<ChildTransfer> {
                       Navigator.pop(context); // Close dialog on success
                     } else {
                       // Handle failure to update the saved amount
+                      if(mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                                'Failed to update saved amount for milestone!'),
+                            backgroundColor: Colors.red,
+                          ),
+                        );
+                      }
+                    }
+                  } else {
+                    if(mounted) {
+                      // Show SnackBar if savings creation fails
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
-                          content: Text('Failed to update saved amount for milestone!'),
+                          content: Text('Failed to create Savings!'),
                           backgroundColor: Colors.red,
                         ),
                       );
                     }
-                  } else {
-                    // Show SnackBar if savings creation fails
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text('Failed to create Savings!'),
-                        backgroundColor: Colors.red,
-                      ),
-                    );
                   }
                 } else {
                   print("ERROR: Missing required fields.");

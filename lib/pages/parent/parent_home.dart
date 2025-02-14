@@ -23,6 +23,8 @@ class ParentHomePageState extends State<ParentHomePage> {
 
   AccountController accountController = AccountController();
   AccountModel? childAccount;
+  MilestoneModel? activeMilestone;
+
 
   // List of titles for the AppBar
   final List<String> _titles = [
@@ -42,7 +44,14 @@ class ParentHomePageState extends State<ParentHomePage> {
   void initState() {
     super.initState();
     fetchChildAccount();
+    fetchActiveMilestone();
   }
+
+  Future<void> fetchActiveMilestone() async {
+    activeMilestone = await UserActiveMilestone().getMilestone(); // Assuming you have a method to fetch active milestone
+    setState(() {});
+  }
+
 
   Future<void> fetchChildAccount() async {
     final childIdInt = childId != null ? int.tryParse(childId!) : null;

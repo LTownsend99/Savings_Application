@@ -32,7 +32,16 @@ class _ChildSavingsTipsBoxState extends State<ChildSavingsTipsBox> {
   @override
   void initState() {
     super.initState();
-    tipStream = ticker();
+    // Initialize the stream with the first tip immediately
+    tipStream = _getTipsStream();
+  }
+
+  Stream<String> _getTipsStream() async* {
+    // Yield the first tip immediately
+    yield ChildSavingsTips.savingTips[0];
+
+    // Then yield the rest periodically. allows us to continue yielding values from the ticker()
+    yield* ticker();
   }
 
   @override

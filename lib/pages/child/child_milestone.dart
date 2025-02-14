@@ -28,6 +28,8 @@ class _ChildMilestoneState extends State<ChildMilestone> {
 
   late Future<List<MilestoneModel>> milestonesFuture;
 
+  late MilestoneModel firstActiveMilestone;
+
   @override
   void initState() {
     super.initState();
@@ -47,6 +49,23 @@ class _ChildMilestoneState extends State<ChildMilestone> {
 
           SavedAmountProvider.resetTotalSavedAmount();
           SavedAmountProvider.updateSavedAmount(totalSavedAmount);
+
+          if(milestones.any((m) => m.status.toLowerCase() == 'active'))
+          {
+            firstActiveMilestone = milestones.firstWhere(
+                  (m) => m.status.toLowerCase() == 'active',
+            );
+
+            print('first active: $firstActiveMilestone');
+
+            UserActiveMilestone().saveMilestone(firstActiveMilestone);
+          }else
+          {
+            UserActiveMilestone().clearAccount();
+          }
+
+          setState(() {});
+
         });
       });
     }
@@ -85,23 +104,20 @@ class _ChildMilestoneState extends State<ChildMilestone> {
             }
             return 0; // Maintain original order otherwise
           });
+          
+          if(milestones.any((m) => m.status.toLowerCase() == 'active'))
+            {
+              firstActiveMilestone = milestones.firstWhere(
+                    (m) => m.status.toLowerCase() == 'active',
+              );
 
-          MilestoneModel? firstActiveMilestone = milestones.firstWhere(
-                (m) => m.status.toLowerCase() == 'active',
-          );
+              print('first active: $firstActiveMilestone');
 
-          UserActiveMilestone().saveMilestone(firstActiveMilestone);
-
-          // Calculate progress for the pie chart
-          double totalTargetAmount = milestones.fold(0.0, (sum, milestone) {
-            return sum + (milestone.targetAmount ?? 0.0);
-          });
-
-          double totalProgress = milestones.fold(0.0, (sum, milestone) {
-            return sum + (milestone.savedAmount ?? 0.0);
-          });
-
-          double progressPercentage = (totalProgress / totalTargetAmount).clamp(0.0, 1.0);
+              UserActiveMilestone().saveMilestone(firstActiveMilestone);
+            }else
+              {
+                UserActiveMilestone().clearAccount();
+              }
 
           return SingleChildScrollView(  // Wrap the main body in SingleChildScrollView
             child: Padding(
@@ -153,7 +169,6 @@ class _ChildMilestoneState extends State<ChildMilestone> {
                     ),
                   ),
                   // Add the PieChart below the milestones list
-                  const SizedBox(height: 20), // Space between list and pie chart
                   MilestoneProgressChart(milestone: activeMilestone!),
                 ],
               ),
@@ -236,16 +251,18 @@ class _ChildMilestoneState extends State<ChildMilestone> {
 
                 if (activeMilestone != null && activeMilestone.status.toLowerCase() == 'active') {
                   // Show message and prevent saving
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(
-                        'You already have an active milestone. Please complete this milestone before creating a new one.',
-                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                  if (mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(
+                          'You already have an active milestone. Please complete it first.',
+                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                        ),
+                        backgroundColor: Colors.red,
+                        duration: Duration(seconds: 3),
                       ),
-                      backgroundColor: Colors.red,
-                      duration: Duration(seconds: 3), // Message disappears after 3 seconds
-                    ),
-                  );
+                    );
+                  }
                   return; // Exit function, prevent milestone creation
                 }
 
@@ -277,12 +294,14 @@ class _ChildMilestoneState extends State<ChildMilestone> {
                       refreshMilestones();
                     });
                   } else {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text('Failed to create milestone!'),
-                        backgroundColor: Colors.red,
-                      ),
-                    );
+                    if(mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('Failed to create milestone!'),
+                          backgroundColor: Colors.red,
+                        ),
+                      );
+                    }
                   }
                 } else {
                   print("ERROR: Missing required fields.");
