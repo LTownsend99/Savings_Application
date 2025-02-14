@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:savings_application/model/accountModel.dart';
 
 class AccountController {
   var url = "http://10.0.2.2:8080/account/";
@@ -99,5 +100,29 @@ class AccountController {
       print("Error logging in: $e");
       return null;
     }
+  }
+
+  Future<AccountModel?> getChildAccountForAccount({required int userId}) async {
+    print("Received userId: $userId");
+
+    try {
+      final response = await http.get(Uri.parse("${url}id/$userId"));
+      print("Response status: \${response.statusCode}");
+      print("Response body: \${response.body}");
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> jsonMap = jsonDecode(response.body);
+        print("Decoded JSON: \$jsonMap");
+        return AccountModel.fromJson(jsonMap);
+      } else if (response.statusCode == 404) {
+        print("No child account found for user ID $userId.");
+      } else {
+        print("Failed to fetch child account. Status code: \${response.statusCode}");
+      }
+    } catch (e) {
+      print("Error fetching child account: \$e");
+    }
+
+    return null;
   }
 }

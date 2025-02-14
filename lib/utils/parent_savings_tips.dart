@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
 
-class SavingsTips{
+class ParentSavingsTips{
 
   static final List<String> savingTips = [
-    "Having your own pot of money gives you a sense of freedom",
-    "Set realistic goals that can be achieved",
-    "Think twice before spending. Think 'Do I really need this?'",
-    "Help around the house to earn money at home",
+    "Offer your children money for doing chores around the house.",
+    "Providing an incentive helps motivate children to save.",
+    "Talk openly about money with your children",
+    "Most kids love a challenge, so challenge them to see how much they can save in a month",
     "Make a habit of saving",
-    "Resist peer pressure",
   ];
 
   static List<String> getSavingTips(){
@@ -18,15 +17,15 @@ class SavingsTips{
 
 // Widget to scroll through savings tips
 ticker() {
-  return Stream.periodic(Duration(seconds: 10), (i) => i).map((i) => SavingsTips.savingTips[i % SavingsTips.savingTips.length]);
+  return Stream.periodic(Duration(seconds: 10), (i) => i).map((i) => ParentSavingsTips.savingTips[i % ParentSavingsTips.savingTips.length]);
 }
 
-class SavingsTipsBox extends StatefulWidget {
+class ParentSavingsTipsBox extends StatefulWidget {
   @override
-  _SavingsTipsBoxState createState() => _SavingsTipsBoxState();
+  _ParentSavingsTipsBoxState createState() => _ParentSavingsTipsBoxState();
 }
 
-class _SavingsTipsBoxState extends State<SavingsTipsBox> {
+class _ParentSavingsTipsBoxState extends State<ParentSavingsTipsBox> {
   late Stream<String> tipStream;
 
   @override

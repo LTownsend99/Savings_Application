@@ -2,15 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:savings_application/controller/savings_controller.dart';
 import 'package:savings_application/helpers/default.dart';
-import 'package:savings_application/model/accountModel.dart';
 import 'package:savings_application/model/milestoneModel.dart';
 import 'package:savings_application/model/savingsModel.dart';
 import 'package:savings_application/pages/settings.dart';
-import 'package:savings_application/user/user_account.dart';
 import 'package:savings_application/user/user_active_milestone.dart';
 import 'package:savings_application/user/user_id.dart';
 import 'package:savings_application/utils/saved_amount_provider.dart';
-import 'package:savings_application/utils/savings_tips.dart';
+import 'package:savings_application/utils/child_savings_tips.dart';
 import 'package:savings_application/utils/week_savings_provider.dart';  // Import the WeekSavingsProvider
 import 'package:savings_application/utils/progress_bar.dart';
 import 'child_milestone.dart';
@@ -125,7 +123,7 @@ class ChildHomePageState extends State<ChildHomePage> {
             ),
 
             //SavingsTips
-            SavingsTipsBox(),
+            ChildSavingsTipsBox(),
 
             // Container for the list of saved amounts over the last week
             Padding(
