@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:savings_application/controller/account_controller.dart';
-import 'package:savings_application/helpers/date_time_helper.dart';
 import 'package:savings_application/helpers/helpers.dart';
 
 class RegisterPage extends StatelessWidget {
@@ -37,6 +36,11 @@ class RegisterPage extends StatelessWidget {
     return Scaffold(
       backgroundColor: Helpers.getPageBackground(),
       appBar: AppBar(
+        iconTheme: IconThemeData(
+          color: Colors.white,  // Set the color of the back arrow to white
+        ),
+        title: Text('Register',
+          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 25, color: Colors.white),),
         flexibleSpace: Container(
           decoration: BoxDecoration(
             gradient: LinearGradient(
@@ -121,7 +125,6 @@ class RegisterPage extends StatelessWidget {
                     ),
                     const SizedBox(height: 20),
 
-                    /// Password
                     /// Password
 
                     TextFormField(

@@ -3,8 +3,8 @@ import 'package:savings_application/helpers/helpers.dart';
 import 'package:savings_application/main.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-class SettingsPage extends StatelessWidget {
-  const SettingsPage({super.key});
+class MorePage extends StatelessWidget {
+  const MorePage({super.key});
 
   void _logout(BuildContext context) {
     Navigator.pushAndRemoveUntil(
@@ -23,6 +23,7 @@ class SettingsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Helpers.getPageBackground(),
       body: SingleChildScrollView(  // Wrap the Column with a SingleChildScrollView
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
@@ -58,6 +59,20 @@ class SettingsPage extends StatelessWidget {
                         ),
                       ),
                     ),
+
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Center(
+                        child: Text('Here are some external links to web pages to aid in your learning. '
+                            '\n Select which is most relevant to you.',
+                          style: TextStyle(
+                            fontSize: 18,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    ),
+
                     Center(
                       child: Padding(
                         padding: const EdgeInsets.all(8.0),
@@ -90,7 +105,9 @@ class SettingsPage extends StatelessWidget {
                         ),
                       ),
                     ),
+
                     SizedBox(height: 10),
+
                     Center(
                       child: Padding(
                         padding: const EdgeInsets.all(8.0),

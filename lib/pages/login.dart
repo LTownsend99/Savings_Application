@@ -14,16 +14,14 @@ class LoginPage extends StatelessWidget {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final AccountController accountController = AccountController();
 
+  bool _isPasswordVisible = false;
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Helpers.getPageBackground(),
       appBar: AppBar(
-        title: Text(
-          'Login Page',
-          style: TextStyle(
-              fontWeight: FontWeight.bold, fontSize: 25, color: Colors.white),
-        ),
         flexibleSpace: Container(
           decoration: BoxDecoration(
             gradient: LinearGradient(
@@ -74,11 +72,22 @@ class LoginPage extends StatelessWidget {
                   TextFormField(
                     controller: passwordController,
                     keyboardType: TextInputType.text,
-                    obscureText: true,
+                    obscureText: !_isPasswordVisible, // Toggle visibility
                     decoration: InputDecoration(
                       labelText: 'Password',
                       hintText: 'Enter Password',
                       prefixIcon: Icon(Icons.password),
+                      suffixIcon: IconButton(
+                        icon: Icon(
+                          _isPasswordVisible
+                              ? Icons.visibility
+                              : Icons.visibility_off,
+                        ),
+                        onPressed: () {
+                          _isPasswordVisible = !_isPasswordVisible;
+                          (context as Element).markNeedsBuild(); // Update UI
+                        },
+                      ),
                       border: OutlineInputBorder(),
                     ),
                     validator: (value) {

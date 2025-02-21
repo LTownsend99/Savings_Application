@@ -4,7 +4,7 @@ import 'package:savings_application/helpers/helpers.dart';
 import 'package:savings_application/model/accountModel.dart';
 import 'package:savings_application/model/milestoneModel.dart';
 import 'package:savings_application/pages/parent/parent_milestone.dart';
-import 'package:savings_application/pages/settings.dart';
+import 'package:savings_application/pages/more.dart';
 import 'package:savings_application/user/user_account.dart';
 import 'package:savings_application/user/user_active_milestone.dart';
 import 'package:savings_application/user/user_id.dart';
@@ -20,6 +20,7 @@ class ParentHomePageState extends State<ParentHomePage> {
   int _selectedIndex = 0;
   String? userId = UserId().userId;
   String? childId = UserAccount().userAccount?.childId.toString();
+  Color titleColour = Helpers.getTitleColour();
 
   AccountController accountController = AccountController();
   AccountModel? childAccount;
@@ -30,7 +31,7 @@ class ParentHomePageState extends State<ParentHomePage> {
   final List<String> _titles = [
     'Home',
     'Milestone',
-    'Settings',
+    'More',
   ];
 
   // Handler for navigation bar taps
@@ -101,7 +102,7 @@ class ParentHomePageState extends State<ParentHomePage> {
                       style: TextStyle(
                         fontSize: 22,
                         fontWeight: FontWeight.bold,
-                        color: Helpers.getTitleColour(),
+                        color: titleColour,
                       ),
                     ),
                     const SizedBox(height: 10),
@@ -109,17 +110,17 @@ class ParentHomePageState extends State<ParentHomePage> {
                       ListTile(
                         title: Text(
                           "${childAccount!.firstName} ${childAccount!.lastName}",
-                          style: TextStyle(color:  Helpers.getTitleColour(),),
+                          style: TextStyle(color:  titleColour,),
                         ),
                         subtitle: Text(
                           "User ID: ${childAccount!.userId}\nDOB: ${childAccount!.dateOfBirth?.toLocal().toString().split(' ')[0] ?? 'N/A'}",
-                          style: TextStyle(color:  Helpers.getTitleColour(),),
+                          style: TextStyle(color:  titleColour,),
                         ),
                       )
                     else
                       Text(
                         "No child account found",
-                        style: TextStyle(color:  Helpers.getTitleColour(),),
+                        style: TextStyle(color:  titleColour,),
                       ),
                   ],
                 ),
@@ -133,16 +134,17 @@ class ParentHomePageState extends State<ParentHomePage> {
         ),
       ),
       ParentMilestonePage(),
-      SettingsPage(),
+      MorePage(),
     ];
 
 
     return Scaffold(
       backgroundColor: Helpers.getPageBackground(),
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         title: Text(
           _titles[_selectedIndex],
-          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 25),
+          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 25, color: Colors.white),
         ),
         flexibleSpace: Container(
           decoration: BoxDecoration(

@@ -4,7 +4,7 @@ import 'package:savings_application/controller/savings_controller.dart';
 import 'package:savings_application/helpers/helpers.dart';
 import 'package:savings_application/model/milestoneModel.dart';
 import 'package:savings_application/model/savingsModel.dart';
-import 'package:savings_application/pages/settings.dart';
+import 'package:savings_application/pages/more.dart';
 import 'package:savings_application/user/user_active_milestone.dart';
 import 'package:savings_application/user/user_id.dart';
 import 'package:savings_application/utils/saved_amount_provider.dart';
@@ -28,13 +28,14 @@ class ChildHomePageState extends State<ChildHomePage> {
   late double totalSaved;
   double targetAmount = 300;
   late double progress;
+  Color titleColour = Helpers.getTitleColour();
 
   // List of titles for the AppBar
   final List<String> _titles = [
     'Home',
     'Child Milestone',
     'Transfer',
-    'Settings',
+    'More',
   ];
 
   // Handler for navigation bar taps
@@ -124,9 +125,9 @@ class ChildHomePageState extends State<ChildHomePage> {
                     Text(
                       "Total Saved",
                       style: TextStyle(
-                        fontSize: 28,
+                        fontSize: 30,
                         fontWeight: FontWeight.bold,
-                        color: Colors.black,
+                        color: titleColour,
                       ),
                     ),
                     const SizedBox(height: 10), // Spacing between title and balance
@@ -137,7 +138,7 @@ class ChildHomePageState extends State<ChildHomePage> {
                       style: TextStyle(
                         fontSize: 36,
                         fontWeight: FontWeight.w600,
-                        color: Helpers.getTitleColour(),
+                        color: titleColour,
                       ),
                     ),
                   ],
@@ -173,7 +174,7 @@ class ChildHomePageState extends State<ChildHomePage> {
                       style: TextStyle(
                         fontSize: 22,
                         fontWeight: FontWeight.bold,
-                        color: Helpers.getTitleColour(),
+                        color: titleColour,
                       ),
                     ),
                     const SizedBox(height: 10), // Space between title and list
@@ -227,7 +228,7 @@ class ChildHomePageState extends State<ChildHomePage> {
                       style: TextStyle(
                         fontSize: 22,
                         fontWeight: FontWeight.bold,
-                        color: Helpers.getTitleColour(),
+                        color: titleColour,
                       ),
                     ),
                     const SizedBox(height: 10),
@@ -245,15 +246,16 @@ class ChildHomePageState extends State<ChildHomePage> {
       // Transfer Page
       ChildTransfer(),
       // Settings Page
-      SettingsPage(),
+      MorePage(),
     ];
 
     return Scaffold(
       backgroundColor: Helpers.getPageBackground(),
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         title: Text(
           _titles[_selectedIndex],
-          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 25),
+          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 25, color: Colors.white),
         ),
         flexibleSpace: Container(
           decoration: BoxDecoration(
@@ -284,8 +286,8 @@ class ChildHomePageState extends State<ChildHomePage> {
             label: 'Transfer',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.settings),
-            label: 'Settings',
+            icon: Icon(Icons.more_horiz),
+            label: 'More',
           ),
         ],
         selectedItemColor: Colors.blue,
