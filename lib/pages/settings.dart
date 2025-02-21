@@ -15,47 +15,22 @@ class SettingsPage extends StatelessWidget {
   }
 
   void _launchURL(Uri url) async {
-    try {
-      // Ensure the URL is valid and can be launched
-      if (await canLaunch(url.toString())) {
-        await launchUrl(url);
-      } else {
-        throw 'Could not launch $url';
-      }
-    } catch (e) {
-      print('Error launching URL: $e');
+    if (!await launchUrl(url)) {
+      throw 'Could not launch $url';
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          SizedBox(height: 50), // Space from the top
-          Center(
-            child: ElevatedButton(
-              onPressed: () => _logout(context),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.green,
-                foregroundColor: Colors.white,
-                minimumSize: Size(300, 50),
-              ),
-              child: Text(
-                "Log Out",
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 22,
-                ),
-              ),
-            ),
-          ),
-          SizedBox(height: 50), // Space between logout and More Learning section
-          SizedBox(
-            height: 500, // Adjust this value to control the height of the box
-            width: double.infinity, // Makes it as wide as the screen
-            child: Padding(
+      body: SingleChildScrollView(  // Wrap the Column with a SingleChildScrollView
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            SizedBox(height: 50), // Space from the top (keep this if needed for margin)
+
+            // "More Learning" section should be the first widget in the column
+            Padding(
               padding: EdgeInsets.symmetric(horizontal: 20),
               child: Container(
                 padding: EdgeInsets.all(20),
@@ -71,95 +46,80 @@ class SettingsPage extends StatelessWidget {
                   ],
                 ),
                 child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,  // Align the text to the start
                   children: [
-                    Text(
-                      "More Learning",
-                      style: TextStyle(
-                        fontSize: 30,
-                        fontWeight: FontWeight.bold,
-                        color: Helpers.getTitleColour()
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
+                    Center(
                       child: Text(
-                        "  Key Stage 3 \n (Years 7 to 9)",
+                        "More Learning",
                         style: TextStyle(
+                          fontSize: 30,
                           fontWeight: FontWeight.bold,
-                          fontSize: 22,
+                          color: Helpers.getTitleColour(),
                         ),
                       ),
                     ),
-                    ElevatedButton(
-                      onPressed: () {
-                        Uri url = Uri.parse('https://ybsmoneyminds.co.uk/money-minds');
-
-                        _launchURL(url);
-
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.green,
-                        foregroundColor: Colors.white,
-                        minimumSize: Size(300, 50),
-                      ),
-                      child: Text(
-                        "I'm aged 11 to 14",
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 22,
+                    Center(
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text(
+                          "       Key Stage 3 - 5 \n (Years 7 to Sixth form)",
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 22,
+                          ),
                         ),
                       ),
                     ),
-                    SizedBox(height: 10),
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Text(
-                        "   Key Stage 4\n(Years 10 to 11)",
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 22,
+                    Center(
+                      child: ElevatedButton(
+                        onPressed: () {
+                          Uri url = Uri.parse('https://ybsmoneyminds.co.uk/money-minds');
+                          _launchURL(url);
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.green,
+                          foregroundColor: Colors.white,
+                          minimumSize: Size(300, 50),
                         ),
-                      ),
-                    ),
-                    ElevatedButton(
-                      onPressed: () => _logout(context),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.green,
-                        foregroundColor: Colors.white,
-                        minimumSize: Size(300, 50),
-                      ),
-                      child: Text(
-                        "I'm aged 14 to 16",
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 22,
+                        child: Text(
+                          "I'm aged 11 to 17",
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 22,
+                          ),
                         ),
                       ),
                     ),
                     SizedBox(height: 10),
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Text(
-                        "                Key Stage 5 \n(Sixth form/further education)",
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 22,
+                    Center(
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text(
+                          "I'm a Parent or Carer",
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 22,
+                          ),
                         ),
                       ),
                     ),
-                    ElevatedButton(
-                      onPressed: () => _logout(context),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.green,
-                        foregroundColor: Colors.white,
-                        minimumSize: Size(300, 50),
-                      ),
-                      child: Text(
-                        "I'm aged 16 to 19",
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 22,
+                    Center(
+                      child: ElevatedButton(
+                        onPressed: () {
+                          Uri url = Uri.parse('https://ybsmoneyminds.co.uk/im-a-parent-or-carer');
+                          _launchURL(url);
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.green,
+                          foregroundColor: Colors.white,
+                          minimumSize: Size(300, 50),
+                        ),
+                        child: Text(
+                          "Parent or Carer",
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 22,
+                          ),
                         ),
                       ),
                     ),
@@ -167,10 +127,30 @@ class SettingsPage extends StatelessWidget {
                 ),
               ),
             ),
-          ),
+            SizedBox(height: 50), // Space between More Learning and Logout button
 
-        ],
+            // Log out button
+            Center(
+              child: ElevatedButton(
+                onPressed: () => _logout(context),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.green,
+                  foregroundColor: Colors.white,
+                  minimumSize: Size(300, 50),
+                ),
+                child: Text(
+                  "Log Out",
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 22,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
 }
+
