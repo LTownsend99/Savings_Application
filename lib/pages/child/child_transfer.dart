@@ -63,7 +63,7 @@ class _ChildTransferState extends State<ChildTransfer> {
             padding: const EdgeInsets.all(14.0),
             child: Text(
               "Total Saved: £${SavedAmountProvider.totalSavedAmount.toStringAsFixed(2)}",
-              style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+              style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: Helpers.getTitleColour()),
             ),
           ),
 

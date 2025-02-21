@@ -27,6 +27,8 @@ class _ParentMilestoneState extends State<ParentMilestonePage> {
   final poundsController = TextEditingController();
   final penceController = TextEditingController();
 
+  Color titleColour = Helpers.getTitleColour();
+
   @override
   void initState() {
     super.initState();
@@ -124,7 +126,7 @@ class _ParentMilestoneState extends State<ParentMilestonePage> {
                                 style: TextStyle(
                                   fontSize: 22,
                                   fontWeight: FontWeight.bold,
-                                  color: Helpers.getTitleColour(),
+                                  color: titleColour,
                                 ),
                               ),
                             ),
@@ -203,7 +205,7 @@ class _ParentMilestoneState extends State<ParentMilestonePage> {
                                 style: TextStyle(
                                   fontSize: 22,
                                   fontWeight: FontWeight.bold,
-                                  color: Helpers.getTitleColour(),
+                                  color: titleColour,
                                 ),
                               ),
                             ),
