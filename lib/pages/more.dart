@@ -24,13 +24,13 @@ class MorePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Helpers.getPageBackground(),
-      body: SingleChildScrollView(  // Wrap the Column with a SingleChildScrollView
+      body: SingleChildScrollView(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
-            SizedBox(height: 50), // Space from the top (keep this if needed for margin)
+            SizedBox(height: 50),
 
-            // "More Learning" section should be the first widget in the column
+            //More Learning
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 20),
               child: Container(
@@ -47,7 +47,7 @@ class MorePage extends StatelessWidget {
                   ],
                 ),
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,  // Align the text to the start
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Center(
                       child: Text(
@@ -144,7 +144,7 @@ class MorePage extends StatelessWidget {
                 ),
               ),
             ),
-            SizedBox(height: 50), // Space between More Learning and Logout button
+            SizedBox(height: 50),
 
             // Log out button
             Center(

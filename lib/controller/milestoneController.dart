@@ -6,16 +6,16 @@ import 'package:savings_application/model/milestoneModel.dart';
 
 class MilestoneController{
 
-  var url = "http://10.0.2.2:8080/milestone/";
+  var url = "http://10.0.2.2:8080/milestone/";  //Backend Milestone URL
 
 
   Future<List<MilestoneModel>> getMilestonesForAccount({required int userId}) async {
-    print("Received userId: $userId"); // Log the userId to check if it's really being passed correctly
+    print("Received userId: $userId");
 
     try {
       final response = await http.get(Uri.parse("${url}user/$userId"));
-      print("Response status: ${response.statusCode}");  // Log status code
-      print("Response body: ${response.body}"); // Log the response body
+      print("Response status: ${response.statusCode}");
+      print("Response body: ${response.body}");
 
       if (response.statusCode == 200) {
         final List<dynamic> jsonList = jsonDecode(response.body);
@@ -37,7 +37,6 @@ class MilestoneController{
   }
 
 
-  // Method to fetch milestones for a user by userId
   Future<List<MilestoneModel>?> getMilestonesByStatus(String status) async {
     try {
       final response = await http.get(Uri.parse("${url}milestone/status/$status"));
@@ -82,36 +81,33 @@ class MilestoneController{
       );
 
       if (response.statusCode == 201) {
-        return true; // Successfully created
+        return true;
       } else {
         print("Failed to create milestone. Status Code: ${response.statusCode}");
-        print("Response Body: ${response.body}"); // Print the response body
+        print("Response Body: ${response.body}");
         return false; // Failure
       }
     } catch (e) {
       print("Error creating milestone: $e");
-      return false; // Error occurred
+      return false;
     }
   }
 
-  // Method to update the saved amount for a specific milestone
   Future<bool> updateSavedAmount({
     required int milestoneId,
     required double addedAmount,
   }) async {
     try {
-      // Send a PATCH request to update the saved amount for the milestone
+
       final response = await http.patch(
         Uri.parse("${url}$milestoneId/updateSavedAmount"),
         headers: {"Content-Type": "application/json"},
         body: jsonEncode({
-          "addedAmount": addedAmount, // Pass the added amount as part of the body
+          "addedAmount": addedAmount,
         }),
       );
 
-      // Check the response status code to determine the result
       if (response.statusCode == 200) {
-        // Successfully updated the milestone, you can parse the updated data if needed
         final updatedMilestone = MilestoneModel.fromJson(jsonDecode(response.body));
         print("Updated Milestone: $updatedMilestone");
         return true; // Success

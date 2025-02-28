@@ -3,7 +3,7 @@ import 'package:http/http.dart' as http;
 import 'package:savings_application/model/accountModel.dart';
 
 class AccountController {
-  var url = "http://10.0.2.2:8080/account/";
+  var url = "http://10.0.2.2:8080/account/";  // Backend Account URL
 
   Future<String?> createAccount({
     required String firstName,

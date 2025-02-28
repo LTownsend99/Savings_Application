@@ -2,7 +2,7 @@ import 'package:savings_application/model/accountModel.dart';
 
 class MilestoneModel {
   int milestoneId;
-  AccountModel account;  // This stores the AccountModel object
+  AccountModel account;
   String milestoneName;
   double targetAmount;
   double savedAmount;
@@ -21,7 +21,7 @@ class MilestoneModel {
     required this.status,
   });
 
-  /// Convert JSON payload sent from the API
+  // Convert JSON payload sent from the API
   factory MilestoneModel.fromJson(Map<String, dynamic> json) {
     return MilestoneModel(
       milestoneId: json["milestoneId"] ?? 0, // default to 0 if null
@@ -43,7 +43,7 @@ class MilestoneModel {
     "milestoneName": milestoneName,
     "targetAmount": targetAmount,
     "savedAmount": savedAmount,
-    "startDate": startDate.toIso8601String(), // Convert DateTime to ISO string
+    "startDate": startDate.toIso8601String(),
     "completionDate": completionDate?.toIso8601String(),
     "status": status,
   };

@@ -7,18 +7,15 @@ import 'package:http/http.dart' as http;
 
 
 class SavingsController {
-  var url = "http://10.0.2.2:8080/savings/";
+  var url = "http://10.0.2.2:8080/savings/"; //Backend Savings URL
 
 
-  // Method to fetch savings balance by ID
   Future<SavingsModel?> getBalance({required int savingsId}) async {
 
     try {
-      // Perform GET request
       final response = await http.get(Uri.parse("${url}$savingsId"));
 
       if (response.statusCode == 200) {
-        // If the request is successful, parse the JSON response
         final Map<String, dynamic> json = jsonDecode(response.body);
         return SavingsModel.fromJson(json);
 
@@ -36,12 +33,12 @@ class SavingsController {
   }
 
   Future<List<SavingsModel>> getSavingsForAccount({required int userId}) async {
-    print("Received userId: $userId"); // Log the userId to check if it's really being passed correctly
+    print("Received userId: $userId");
 
     try {
       final response = await http.get(Uri.parse("${url}user/$userId"));
-      print("Response status: ${response.statusCode}");  // Log status code
-      print("Response body: ${response.body}"); // Log the response body
+      print("Response status: ${response.statusCode}");
+      print("Response body: ${response.body}");
 
       if (response.statusCode == 200) {
         final List<dynamic> jsonList = jsonDecode(response.body);
@@ -84,7 +81,7 @@ class SavingsController {
         return true; // Successfully created
       } else {
         print("Failed to create savings. Status Code: ${response.statusCode}");
-        print("Response Body: ${response.body}"); // Print the response body
+        print("Response Body: ${response.body}");
         return false; // Failure
       }
     } catch (e) {

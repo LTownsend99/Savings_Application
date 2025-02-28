@@ -9,7 +9,7 @@ import 'package:savings_application/user/user_active_milestone.dart';
 import 'package:savings_application/user/user_id.dart';
 import 'package:savings_application/utils/saved_amount_provider.dart';
 import 'package:savings_application/utils/child_savings_tips.dart';
-import 'package:savings_application/utils/week_savings_provider.dart';  // Import the WeekSavingsProvider
+import 'package:savings_application/utils/week_savings_provider.dart';
 import 'package:savings_application/utils/progress_bar.dart';
 import 'child_milestone.dart';
 import 'child_transfer.dart';
@@ -53,7 +53,7 @@ class ChildHomePageState extends State<ChildHomePage> {
   }
 
   Future<void> fetchActiveMilestone() async {
-    activeMilestone = await UserActiveMilestone().getMilestone(); // Assuming you have a method to fetch active milestone
+    activeMilestone = await UserActiveMilestone().getMilestone();
     setState(() {});
   }
 
@@ -114,7 +114,6 @@ class ChildHomePageState extends State<ChildHomePage> {
       SingleChildScrollView(
         child: Column(
           children: [
-            // Centralized Balance section at the top
             Padding(
               padding: const EdgeInsets.all(16.0),
               child: Center(
@@ -130,7 +129,7 @@ class ChildHomePageState extends State<ChildHomePage> {
                         color: titleColour,
                       ),
                     ),
-                    const SizedBox(height: 10), // Spacing between title and balance
+                    const SizedBox(height: 10),
 
                     // Balance Value
                     Text(
@@ -177,11 +176,11 @@ class ChildHomePageState extends State<ChildHomePage> {
                         color: titleColour,
                       ),
                     ),
-                    const SizedBox(height: 10), // Space between title and list
+                    const SizedBox(height: 10),
 
                     // Scrollable list of saved amounts for the last week
                     SizedBox(
-                      height: 300, // Set height to make the list scrollable
+                      height: 300,
                       child: ListView.builder(
                         itemCount: 7, // Display 7 items (one for each day of the week)
                         itemBuilder: (context, index) {
@@ -193,7 +192,7 @@ class ChildHomePageState extends State<ChildHomePage> {
                           return ListTile(
                             title: Text(dayLabel), // Display the day and date
                             trailing: Text("Saved: £${savedAmount.toStringAsFixed(2)}",
-                            style: TextStyle(fontSize: 14),), // Display the saved amount for that day
+                            style: TextStyle(fontSize: 14),),
                           );
                         },
                       ),
@@ -245,7 +244,7 @@ class ChildHomePageState extends State<ChildHomePage> {
       ChildMilestone(),
       // Transfer Page
       ChildTransfer(),
-      // Settings Page
+      // More Page
       MorePage(),
     ];
 

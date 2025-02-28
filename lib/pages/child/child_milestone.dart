@@ -102,7 +102,7 @@ class _ChildMilestoneState extends State<ChildMilestone> {
             } else if (a.status.toLowerCase() != 'active' && b.status.toLowerCase() == 'active') {
               return 1; // "Completed" comes later
             }
-            return 0; // Maintain original order otherwise
+            return 0;
           });
           
           if(milestones.any((m) => m.status.toLowerCase() == 'active'))
@@ -119,7 +119,7 @@ class _ChildMilestoneState extends State<ChildMilestone> {
                 UserActiveMilestone().clearAccount();
               }
 
-          return SingleChildScrollView(  // Wrap the main body in SingleChildScrollView
+          return SingleChildScrollView(
             child: Padding(
               padding: const EdgeInsets.all(16.0),
               child: Column(
@@ -168,7 +168,7 @@ class _ChildMilestoneState extends State<ChildMilestone> {
                       ),
                     ),
                   ),
-                  // Add the PieChart below the milestones list
+
                   MilestoneProgressChart(milestone: activeMilestone!),
                 ],
               ),
@@ -250,7 +250,6 @@ class _ChildMilestoneState extends State<ChildMilestone> {
                 MilestoneModel? activeMilestone = UserActiveMilestone().getMilestone();
 
                 if (activeMilestone != null && activeMilestone.status.toLowerCase() == 'active') {
-                  // Show message and prevent saving
                   if (mounted) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(

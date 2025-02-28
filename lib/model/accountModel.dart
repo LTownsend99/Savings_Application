@@ -13,8 +13,8 @@ class AccountModel {
   String email;
   String passwordHash;
   String role;
-  int? childId; // Made nullable
-  DateTime? dateOfBirth; // Made nullable
+  int? childId; // Nullable as a child account does not need one
+  DateTime? dateOfBirth;
 
   AccountModel({
     required this.userId,
@@ -27,7 +27,7 @@ class AccountModel {
     this.dateOfBirth,
   });
 
-  /// Convert JSON payload sent from the API
+  // Convert JSON payload sent from the API
   factory AccountModel.fromJson(Map<String, dynamic> json) => AccountModel(
     userId: json["userId"],
     firstName: json["firstName"],
@@ -35,8 +35,8 @@ class AccountModel {
     email: json["email"],
     passwordHash: json["passwordHash"],
     role: json["role"],
-    childId: json["childId"] != null ? json["childId"] : null, // If it's null, just assign null
-    dateOfBirth: json["dob"] != null ? DateTime.parse(json["dob"]) : null, // If date is null, assign null
+    childId: json["childId"] != null ? json["childId"] : null,
+    dateOfBirth: json["dob"] != null ? DateTime.parse(json["dob"]) : null,
   );
 
 

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';  // Import Provider package
+import 'package:provider/provider.dart';
 import 'package:savings_application/controller/savings_controller.dart';
 import 'package:savings_application/controller/milestoneController.dart';
 import 'package:savings_application/helpers/date_time_helper.dart';
@@ -11,7 +11,7 @@ import 'package:savings_application/user/user_account.dart';
 import 'package:savings_application/user/user_active_milestone.dart';
 import 'package:savings_application/user/user_id.dart';
 import 'package:savings_application/utils/saved_amount_provider.dart';
-import 'package:savings_application/utils/week_savings_provider.dart';  // Import WeekSavingsProvider
+import 'package:savings_application/utils/week_savings_provider.dart';
 
 class ChildTransfer extends StatefulWidget {
   @override
@@ -52,105 +52,97 @@ class _ChildTransferState extends State<ChildTransfer> {
 
   @override
   Widget build(BuildContext context) {
-    // Access the WeekSavingsProvider using Provider.of
     WeekSavingsProvider weekSavingsProvider = Provider.of<WeekSavingsProvider>(context);
 
     return Scaffold(
       backgroundColor: Helpers.getPageBackground(),
-      body: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(14.0),
-            child: Text(
-              "Total Saved: £${SavedAmountProvider.totalSavedAmount.toStringAsFixed(2)}",
-              style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: Helpers.getTitleColour()),
-            ),
-          ),
-
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: ElevatedButton(
-              onPressed: () {
-                _showAddSavingsDialog(context, userId!, weekSavingsProvider);
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.green,
-                foregroundColor: Colors.white,
-                minimumSize: Size(300, 50),
-              ),
-              child: Text("Add Savings",
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 22,
+      body: RefreshIndicator(
+        onRefresh: () async {
+          refreshSavings(); // Refresh savings when pulled down
+        },
+        child: SingleChildScrollView(
+          physics: AlwaysScrollableScrollPhysics(), // Enables pull-to-refresh even when the list is short
+          child: Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(14.0),
+                child: Text(
+                  "Total Saved: £${SavedAmountProvider.totalSavedAmount.toStringAsFixed(2)}",
+                  style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: Helpers.getTitleColour()),
                 ),
               ),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: ElevatedButton(
-              onPressed: () {
-                _showMoneyOutDialog(context, userId!, weekSavingsProvider);
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.green,
-                foregroundColor: Colors.white,
-                minimumSize: Size(300, 50),
-              ),
-              child: Text("Money Out",
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 22,
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: ElevatedButton(
+                  onPressed: () {
+                    _showAddSavingsDialog(context, userId!, weekSavingsProvider);
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.green,
+                    foregroundColor: Colors.white,
+                    minimumSize: Size(300, 50),
+                  ),
+                  child: Text(
+                    "Add Savings",
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 22),
+                  ),
                 ),
               ),
-            ),
-          ),
-          Expanded(
-            child: FutureBuilder<List<SavingsModel>>(
-              future: savingsFuture,
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return Center(child: CircularProgressIndicator());
-                } else if (snapshot.hasError) {
-                  return Center(
-                    child: Text("Error fetching savings: \${snapshot.error}"),
-                  );
-                } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                  return Center(
-                    child: Text(
-                      "No savings found.",
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                    ),
-                  );
-                }
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: ElevatedButton(
+                  onPressed: () {
+                    _showMoneyOutDialog(context, userId!, weekSavingsProvider);
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.green,
+                    foregroundColor: Colors.white,
+                    minimumSize: Size(300, 50),
+                  ),
+                  child: Text(
+                    "Money Out",
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 22),
+                  ),
+                ),
+              ),
+              FutureBuilder<List<SavingsModel>>(
+                future: savingsFuture,
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return Center(child: CircularProgressIndicator());
+                  } else if (snapshot.hasError) {
+                    return Center(child: Text("Error fetching savings: ${snapshot.error}"));
+                  } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                    return Center(
+                      child: Text(
+                        "No savings found.",
+                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                      ),
+                    );
+                  }
 
-                final savings = snapshot.data!;
+                  final savings = snapshot.data!;
+                  double totalSavedAmount = savings.fold(0.0, (sum, item) => sum + item.amount);
+                  SavedAmountProvider.updateSavedAmount(totalSavedAmount);
 
-                // Calculate total savings for all time
-                double totalSavedAmount = savings.fold(0.0, (sum, item) => sum + item.amount);
-
-                // Update the global saved amount
-                SavedAmountProvider.updateSavedAmount(totalSavedAmount);
-
-
-                return Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(10),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.grey.withOpacity(0.2),
-                          spreadRadius: 2,
-                          blurRadius: 4,
-                          offset: Offset(0, 3),
-                        ),
-                      ],
-                    ),
-                    child: SizedBox(
-                      height: 450, // Set an appropriate height
+                  return Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(10),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.grey.withOpacity(0.2),
+                            spreadRadius: 2,
+                            blurRadius: 4,
+                            offset: Offset(0, 3),
+                          ),
+                        ],
+                      ),
                       child: ListView.builder(
+                        physics: NeverScrollableScrollPhysics(), // Prevents nested scrolling issues
+                        shrinkWrap: true, // Allows the ListView to be inside a Column
                         itemCount: savings.length,
                         itemBuilder: (context, index) {
                           final savingsItem = savings[index];
@@ -173,15 +165,16 @@ class _ChildTransferState extends State<ChildTransfer> {
                         },
                       ),
                     ),
-                  ),
-                );
-              },
-            ),
+                  );
+                },
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }
+
 
   void _showAddSavingsDialog(BuildContext context, String userId, WeekSavingsProvider weekSavingsProvider) {
     showDialog(
@@ -266,9 +259,6 @@ class _ChildTransferState extends State<ChildTransfer> {
                   int dayIndex = DateTime.now().weekday - 1; // Get the current day index (1 for Monday, 7 for Sunday)
 
 
-                  // Now update the global saved amount
-                  SavedAmountProvider.updateSavedAmount(amount);
-
                   // Call updateSavedAmount after successful savings creation
                   final updateResult = await milestoneController.updateSavedAmount(
                     milestoneId: int.parse(milestoneId),
@@ -308,7 +298,6 @@ class _ChildTransferState extends State<ChildTransfer> {
                     }
                   } else {
                     if(mounted) {
-                      // Show SnackBar if savings creation fails
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
                           content: Text('Failed to create Savings!'),
@@ -334,8 +323,6 @@ class _ChildTransferState extends State<ChildTransfer> {
       context: context,
       builder: (BuildContext context) {
 
-        MilestoneModel? activeMilestone = UserActiveMilestone().getMilestone();
-
         return AlertDialog(
           title: Text('Transfer Money Out'),
           content: SingleChildScrollView(
@@ -351,21 +338,21 @@ class _ChildTransferState extends State<ChildTransfer> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Send to', // Title
+                      'Send to',
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w500,
                         color: Colors.black87,
                       ),
                     ),
-                    const SizedBox(height: 5), // Space between title and text box
+                    const SizedBox(height: 5),
                     Container(
                       width: double.infinity, // Makes the box expand to full width
                       padding: EdgeInsets.all(12),
                       decoration: BoxDecoration(
-                        color: Colors.grey[200], // Mimics TextFormField background
+                        color: Colors.grey[200],
                         borderRadius: BorderRadius.circular(8),
-                        border: Border.all(color: Colors.grey), // Mimics TextFormField border
+                        border: Border.all(color: Colors.grey),
                       ),
                       child: Text(
                         'Where account details would be filled in. However, for this project, this is out of scope.',
@@ -393,7 +380,7 @@ class _ChildTransferState extends State<ChildTransfer> {
                         maxLength: 2, // Limit to 2 digits
                         decoration: InputDecoration(
                           labelText: 'Pence',
-                          counterText: '', // Hides the character count
+                          counterText: '',
                         ),
                       ),
                     ),

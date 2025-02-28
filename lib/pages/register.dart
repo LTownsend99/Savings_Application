@@ -27,7 +27,7 @@ class RegisterPage extends StatelessWidget {
 
     if (pickedDate != null && pickedDate != dateOfBirth) {
       dateOfBirth = pickedDate;
-      (context as Element).markNeedsBuild(); // Update UI
+      (context as Element).markNeedsBuild();
     }
   }
 
@@ -37,7 +37,7 @@ class RegisterPage extends StatelessWidget {
       backgroundColor: Helpers.getPageBackground(),
       appBar: AppBar(
         iconTheme: IconThemeData(
-          color: Colors.white,  // Set the color of the back arrow to white
+          color: Colors.white,
         ),
         title: Text('Register',
           style: TextStyle(fontWeight: FontWeight.bold, fontSize: 25, color: Colors.white),),
@@ -141,7 +141,7 @@ class RegisterPage extends StatelessWidget {
                           ),
                           onPressed: () {
                             _isPasswordVisible = !_isPasswordVisible;
-                            (context as Element).markNeedsBuild(); // Update UI
+                            (context as Element).markNeedsBuild();
                           },
                         ),
                       ),
@@ -213,7 +213,6 @@ class RegisterPage extends StatelessWidget {
                         Expanded(
                           child: TextFormField(
                             readOnly: true,
-                            // Prevent manual input
                             decoration: const InputDecoration(
                               labelText: "Date of Birth",
                               prefixIcon: Icon(Icons.calendar_today),
@@ -269,7 +268,6 @@ class RegisterPage extends StatelessWidget {
                                 ),
                               );
 
-                              // Show the dialog with the userId
                               showDialog(
                                 context: context,
                                 builder: (BuildContext context) {

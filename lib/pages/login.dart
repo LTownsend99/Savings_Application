@@ -72,7 +72,7 @@ class LoginPage extends StatelessWidget {
                   TextFormField(
                     controller: passwordController,
                     keyboardType: TextInputType.text,
-                    obscureText: !_isPasswordVisible, // Toggle visibility
+                    obscureText: !_isPasswordVisible,
                     decoration: InputDecoration(
                       labelText: 'Password',
                       hintText: 'Enter Password',
@@ -85,7 +85,7 @@ class LoginPage extends StatelessWidget {
                         ),
                         onPressed: () {
                           _isPasswordVisible = !_isPasswordVisible;
-                          (context as Element).markNeedsBuild(); // Update UI
+                          (context as Element).markNeedsBuild();
                         },
                       ),
                       border: OutlineInputBorder(),

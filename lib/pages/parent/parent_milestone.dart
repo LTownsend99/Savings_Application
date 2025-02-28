@@ -94,7 +94,7 @@ class _ParentMilestoneState extends State<ParentMilestonePage> {
             UserActiveMilestone().saveMilestone(activeMilestone);
           }
 
-          return SingleChildScrollView(  // Wrap the main body in SingleChildScrollView
+          return SingleChildScrollView(
             child: Padding(
               padding: const EdgeInsets.all(16.0),
               child: Column(
@@ -117,7 +117,7 @@ class _ParentMilestoneState extends State<ParentMilestonePage> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          // Title for Active Milestones within the box
+
                           Padding(
                             padding: const EdgeInsets.all(16.0),
                             child: Center(
@@ -176,8 +176,7 @@ class _ParentMilestoneState extends State<ParentMilestonePage> {
                         ],
                       ),
                     ),
-                  if (activeMilestone != null) SizedBox(height: 20),  // Space between active and completed lists
-
+                  if (activeMilestone != null) SizedBox(height: 20),
                   // Completed Milestones List
                   if (completedMilestones.isNotEmpty)
                     Container(
@@ -196,7 +195,6 @@ class _ParentMilestoneState extends State<ParentMilestonePage> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          // Title for Completed Milestones within the box
                           Padding(
                             padding: const EdgeInsets.all(16.0),
                             child: Center(
@@ -212,7 +210,7 @@ class _ParentMilestoneState extends State<ParentMilestonePage> {
                           ),
                           // Completed Milestones list
                           SizedBox(
-                            height: 300, // Adjust height for completed milestones list
+                            height: 300,
                             child: ListView.builder(
                               itemCount: completedMilestones.length,
                               itemBuilder: (context, index) {
@@ -334,14 +332,6 @@ class _ParentMilestoneState extends State<ParentMilestonePage> {
                   // Add the savings to the correct day of the week
                   int dayIndex = DateTime.now().weekday - 1; // Get the current day index (1 for Monday, 7 for Sunday)
 
-                  /*setState(() {
-                    // Update the savings for the current day
-                    weekSavingsProvider.addSavingsToDay(amount, dayIndex);
-                  });
-
-                  // Now update the global saved amount
-                  SavedAmountProvider.updateSavedAmount(amount);*/
-
                   // Create the savings entry in the database
                   final result = await savingsController.addSavings(
                       user: childAccount!,
@@ -359,7 +349,7 @@ class _ParentMilestoneState extends State<ParentMilestonePage> {
 
                     if (updateResult) {
                       // Update successful, refresh the savings and pop the context
-                      Navigator.pop(context); // Close dialog on success
+                      Navigator.pop(context);
                     } else {
                       // Handle failure to update the saved amount
                       ScaffoldMessenger.of(context).showSnackBar(
@@ -370,7 +360,6 @@ class _ParentMilestoneState extends State<ParentMilestonePage> {
                       );
                     }
                   } else {
-                    // Show SnackBar if savings creation fails
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
                         content: Text('Failed to create Savings!'),

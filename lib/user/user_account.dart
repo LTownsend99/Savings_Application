@@ -13,7 +13,7 @@ class UserAccount {
   UserAccount._internal();
 
   void saveAccount(AccountModel account) {
-    print("Saving account: ${account.firstName} ${account.lastName}"); // Debug print
+    print("Saving account: ${account.firstName} ${account.lastName}");
     userAccount = account;
   }
 
@@ -23,7 +23,7 @@ class UserAccount {
   }
 
   AccountModel? getAccount() {
-    print("Retrieving account: ${userAccount?.firstName} ${userAccount?.lastName}"); // Debug print
+    print("Retrieving account: ${userAccount?.firstName} ${userAccount?.lastName}");
     return userAccount;
   }
 }

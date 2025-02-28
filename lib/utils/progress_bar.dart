@@ -19,7 +19,6 @@ class MilestoneProgressBar extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Progress text
         Text(
           "Milestone Id: $milestoneId ",
           style: TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
@@ -34,15 +33,15 @@ class MilestoneProgressBar extends StatelessWidget {
           "Total Saved: \£${savedAmount.toStringAsFixed(2)} / Goal: \£${targetAmount.toStringAsFixed(2)}",
           style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
         ),
-        const SizedBox(height: 10), // Space between text and progress bar
+        const SizedBox(height: 10),
 
-        // LinearProgressIndicator (Progress Bar)
+        // Progress Bar
         LinearProgressIndicator(
           value: progress,
-          backgroundColor: Colors.grey[300], // Background color
-          valueColor: AlwaysStoppedAnimation<Color>(Colors.blue), // Progress color
+          backgroundColor: Colors.grey[300],
+          valueColor: AlwaysStoppedAnimation<Color>(Colors.blue),
         ),
-        const SizedBox(height: 10), // Space after the progress bar
+        const SizedBox(height: 10),
       ],
     );
   }

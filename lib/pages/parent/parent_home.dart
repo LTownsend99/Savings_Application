@@ -49,7 +49,7 @@ class ParentHomePageState extends State<ParentHomePage> {
   }
 
   Future<void> fetchActiveMilestone() async {
-    activeMilestone = await UserActiveMilestone().getMilestone(); // Assuming you have a method to fetch active milestone
+    activeMilestone = await UserActiveMilestone().getMilestone();
     setState(() {});
   }
 
