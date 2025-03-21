@@ -277,7 +277,7 @@ class ChildHomePageState extends State<ChildHomePage> {
             label: 'Home',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.child_friendly),
+            icon: Icon(Icons.task_alt_rounded),
             label: 'Milestone',
           ),
           BottomNavigationBarItem(

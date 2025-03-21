@@ -95,38 +95,52 @@ class ParentHomePageState extends State<ParentHomePage> {
                   ],
                 ),
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text(
-                      "Child Account",
-                      style: TextStyle(
-                        fontSize: 22,
-                        fontWeight: FontWeight.bold,
-                        color: titleColour,
+                    Center(
+                      child: Text(
+                        "Child Account",
+                        style: TextStyle(
+                          fontSize: 25,
+                          fontWeight: FontWeight.bold,
+                          color: titleColour,
+                        ),
+                        textAlign: TextAlign.center,
                       ),
                     ),
-                    const SizedBox(height: 10),
+                    const SizedBox(height: 5),
                     if (childAccount != null)
-                      ListTile(
-                        title: Text(
-                          "${childAccount!.firstName} ${childAccount!.lastName}",
-                          style: TextStyle(color:  titleColour,),
-                        ),
-                        subtitle: Text(
-                          "User ID: ${childAccount!.userId}\nDOB: ${childAccount!.dateOfBirth?.toLocal().toString().split(' ')[0] ?? 'N/A'}",
-                          style: TextStyle(color:  titleColour,),
+                      Center(
+                        child: Column(
+                          children: [
+                            Text(
+                              "${childAccount!.firstName} ${childAccount!.lastName}",
+                              style: TextStyle(color: titleColour, fontSize: 18,),
+                              textAlign: TextAlign.center,
+                            ),
+                            Text(
+                              "User ID: ${childAccount!.userId}\nDOB: ${childAccount!.dateOfBirth?.toLocal().toString().split(' ')[0] ?? 'N/A'}",
+                              style: TextStyle(color: titleColour,fontSize: 18,),
+                              textAlign: TextAlign.center,
+                            ),
+                          ],
                         ),
                       )
                     else
-                      Text(
-                        "No child account found",
-                        style: TextStyle(color:  titleColour,),
+                      Center(
+                        child: Text(
+                          "No child account found",
+                          style: TextStyle(color: titleColour),
+                          textAlign: TextAlign.center,
+                        ),
                       ),
                   ],
                 ),
               ),
             ),
-            ParentSavingsTipsBox(),
+
+      ParentSavingsTipsBox(),
 
             MilestoneProgressChart(milestone: activeMilestone!),
 
@@ -166,12 +180,12 @@ class ParentHomePageState extends State<ParentHomePage> {
             label: 'Home',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.child_friendly),
+            icon: Icon(Icons.task_alt_rounded),
             label: 'Milestone',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.settings),
-            label: 'Settings',
+            icon: Icon(Icons.more_horiz),
+            label: 'More',
           ),
         ],
         selectedItemColor: Colors.blue,

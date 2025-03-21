@@ -258,7 +258,7 @@ class _ChildMilestoneState extends State<ChildMilestone> {
                           style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
                         ),
                         backgroundColor: Colors.red,
-                        duration: Duration(seconds: 3),
+                        duration: Duration(seconds: 7),
                       ),
                     );
                   }
