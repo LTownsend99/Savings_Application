@@ -121,7 +121,7 @@ class _ChildTransferState extends State<ChildTransfer> {
                     );
                   }
 
-                  final savings = snapshot.data!;
+                  final savings = snapshot.data!..sort((a, b) => b.savId.compareTo(a.savId));
                   double totalSavedAmount = savings.fold(0.0, (sum, item) => sum + item.amount);
                   SavedAmountProvider.updateSavedAmount(totalSavedAmount);
 
