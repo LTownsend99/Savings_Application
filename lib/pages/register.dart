@@ -305,6 +305,7 @@ class RegisterPage extends StatelessWidget {
                                             icon: const Icon(Icons.close),
                                             onPressed: () {
                                               Navigator.pop(context);
+                                              Navigator.pop(context);
                                             },
                                           ),
                                         ),
