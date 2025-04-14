@@ -33,7 +33,7 @@ class ChildHomePageState extends State<ChildHomePage> {
   // List of titles for the AppBar
   final List<String> _titles = [
     'Home',
-    'Child Milestone',
+    'Milestone',
     'Transfer',
     'More',
   ];
