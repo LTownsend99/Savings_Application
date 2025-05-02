@@ -1,16 +1,23 @@
-# savings_application
+# Savings App for Young People
 
-Savings Application
 
 ## Getting Started
 
-This project is a starting point for a Flutter application.
+Before you run the app ensure the database and springboot application are both 
+running successfully.
 
-A few resources to get you started if this is your first Flutter project:
+Using a virtual device select Medium Phone API 35 and 
+start the device prior to running main.dart
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+Also ensure the URL to the springboot application is correct on all controller classes
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+If this is not correct, calls via both services will not be able to be made.
+
+```
+  var url = "http://10.0.2.2:8080/account/";
+```
+Here is the variable that may need to be changed.
+
+## Running the project
+
+To run the project use main.dart
